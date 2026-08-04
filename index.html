@@ -72,6 +72,8 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .weight-row{display:flex;align-items:center;gap:10px;margin-top:8px}
 .weight-input{width:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-align:center;outline:none;background:var(--bg);color:var(--text);transition:border-color 0.15s}
 .weight-input:focus{border-color:var(--primary)}
+.reps-input{width:52px;padding:8px 6px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;text-align:center;outline:none;background:var(--bg);color:var(--text);transition:border-color 0.15s}
+.reps-input:focus{border-color:var(--primary)}
 .weight-unit{font-size:13px;color:var(--text-secondary);font-weight:500}
 .lift-btn{padding:6px 14px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s}
 .lift-btn.primary{background:var(--primary);color:#fff}
@@ -205,7 +207,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 <script>
 // ========== IndexedDB ==========
 const DB_NAME = 'TrainingsPlan';
-const DB_VER = 1;
+const DB_VER = 2;
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -226,11 +228,11 @@ function openDB() {
   });
 }
 
-async function saveWeight(weekId, exerciseId, weight) {
+async function saveWeight(weekId, exerciseId, weight, reps) {
   const db = await openDB();
   const tx = db.transaction('weights', 'readwrite');
   const store = tx.objectStore('weights');
-  await store.put({ id: `${weekId}_${exerciseId}`, week: weekId, exerciseId, weight, updatedAt: Date.now() });
+  await store.put({ id: `${weekId}_${exerciseId}`, week: weekId, exerciseId, weight, reps, updatedAt: Date.now() });
   return new Promise(r => { tx.oncomplete = () => r(); });
 }
 
@@ -302,7 +304,7 @@ function determineCurrentWeek() {
 async function refreshData() {
   const weights = await loadAllWeights();
   savedWeights = {};
-  weights.forEach(w => { savedWeights[`${w.week}_${w.exerciseId}`] = w.weight; });
+  weights.forEach(w => { savedWeights[`${w.week}_${w.exerciseId}`] = {weight: w.weight, reps: w.reps}; });
   const sets = await loadAllSets();
   savedSets = {};
   sets.forEach(s => { savedSets[`${s.week}_${s.exerciseId}`] = s; });
@@ -333,7 +335,7 @@ function renderOverview() {
   const week = PLAN.weeks.find(w => w.id === currentWeek) || PLAN.weeks[0];
   // Stats
   const totalEx = week.exercises.length;
-  const savedCount = week.exercises.filter(e => savedWeights[`${week.id}_${e.id}`] != null).length;
+  const savedCount = week.exercises.filter(e => savedWeights[`${week.id}_${e.id}`]?.weight != null).length;
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card"><div class="value">${week.id}/8</div><div class="label">Aktuelle Woche</div></div>
     <div class="stat-card"><div class="value">${savedCount}/${totalEx}</div><div class="label">Gewichte notiert</div></div>
@@ -341,7 +343,8 @@ function renderOverview() {
   // Week overview
   const exHtml = week.exercises.map(e => {
     const sw = savedWeights[`${week.id}_${e.id}`];
-    const weightStr = sw ? `${sw} kg` : (e.weight ? `${e.weight} kg` : 'BW');
+    const wgt = sw?.weight;
+    const weightStr = wgt ? `${wgt} kg` : (e.weight ? `${e.weight} kg` : 'BW');
     return `<div class="exercise">
       <div class="top"><span class="name">${e.name}</span><span style="font-weight:600;color:var(--primary)">${e.sets}×${e.reps || '—'}</span></div>
       <div class="detail">${weightStr}${e.desc ? ' · ' + e.desc : ''}</div>
@@ -365,7 +368,7 @@ function renderTraining() {
   if (!trainingInitialized) {
     sel.innerHTML = PLAN.weeks.map(w => {
       const ww = savedWeights;
-      const done = w.exercises.every(e => ww[`${w.id}_${e.id}`] != null);
+      const done = w.exercises.every(e => ww[`${w.id}_${e.id}`]?.weight != null);
       let cls = 'week-chip';
       if (w.id === currentWeek) cls += ' active';
       if (w.isDeload) cls += ' deload';
@@ -397,7 +400,9 @@ async function renderWeek(weekId) {
   </div>`;
 
   for (const e of week.exercises) {
-    const savedW = savedWeights[`${week.id}_${e.id}`];
+    const saved = savedWeights[`${week.id}_${e.id}`];
+    const savedW = saved?.weight;
+    const savedR = saved?.reps;
     const setData = savedSets[`${week.id}_${e.id}`] || { doneSets: 0, totalSets: e.sets || 0 };
     const card = document.createElement('div');
     card.className = 'card';
@@ -422,12 +427,15 @@ async function renderWeek(weekId) {
       <div class="exercise" style="padding:0;border:none">
         <div class="top">
           <div><span class="name">${e.name}</span> ${badgeHtml}</div>
-          <span style="font-weight:600;color:var(--primary)">${e.sets}×${e.reps || '—'}</span>
+          <span style="font-weight:600;color:var(--primary)">${e.sets}×<span id="r_${week.id}_${e.id}_disp">${savedR || e.reps || '—'}</span></span>
         </div>
         <div class="detail">${e.desc || ''}${e.rest ? ' · Pause: ' + e.rest : ''}</div>
         <div class="weight-row">
           <input type="number" class="weight-input" id="w_${week.id}_${e.id}" value="${savedW || e.weight || ''}" placeholder="${e.weight || 0}" step="0.5" min="0" inputmode="decimal">
           <span class="weight-unit">kg</span>
+          <span style="font-size:13px;color:var(--text-secondary);margin:0 2px">×</span>
+          <input type="number" class="reps-input" id="r_${week.id}_${e.id}" value="${savedR || e.reps || ''}" placeholder="${e.reps || ''}" step="1" min="0" inputmode="numeric">
+          <span class="weight-unit">WH</span>
           <button class="lift-btn ${savedW != null ? 'saved' : 'primary'}" id="b_${week.id}_${e.id}" onclick="saveEx(${week.id},'${e.id}')">${savedW != null ? '✓' : 'Speichern'}</button>
         </div>
         <div class="set-row">
@@ -442,11 +450,15 @@ async function renderWeek(weekId) {
 
 async function saveEx(weekId, exerciseId) {
   const input = document.getElementById(`w_${weekId}_${exerciseId}`);
+  const repsInput = document.getElementById(`r_${weekId}_${exerciseId}`);
+  const disp = document.getElementById(`r_${weekId}_${exerciseId}_disp`);
   const btn = document.getElementById(`b_${weekId}_${exerciseId}`);
   const val = parseFloat(input.value);
+  const reps = parseInt(repsInput.value);
   if (isNaN(val) || val <= 0) { showToast('Bitte gültiges Gewicht eingeben'); return; }
-  await saveWeight(weekId, exerciseId, val);
-  savedWeights[`${weekId}_${exerciseId}`] = val;
+  await saveWeight(weekId, exerciseId, val, isNaN(reps) ? undefined : reps);
+  savedWeights[`${weekId}_${exerciseId}`] = {weight: val, reps: isNaN(reps) ? undefined : reps};
+  if (disp) disp.textContent = isNaN(reps) ? '—' : reps;
   btn.textContent = '✓';
   btn.className = 'lift-btn saved';
   showToast('✓ Gespeichert');
@@ -477,8 +489,8 @@ function renderProgress() {
       const e = w.exercises.find(ex => ex.name.includes(name) || name.includes(ex.name.replace(/ –.*/, '').trim()));
       if (!e) return null;
       const sw = savedWeights[`${w.id}_${e.id}`];
-      const wgt = sw || e.weight || 0;
-      return { week: w.id, label: w.label, weight: wgt, saved: sw != null, ex: e };
+      const wgt = sw?.weight || e.weight || 0;
+      return { week: w.id, label: w.label, weight: wgt, saved: sw?.weight != null, ex: e };
     }).filter(Boolean);
 
     const last = entries[entries.length - 1];
@@ -516,8 +528,8 @@ function showExerciseDetail(name) {
     const e = w.exercises.find(ex => ex.name.includes(name) || name.includes(ex.name.replace(/ –.*/, '').trim()));
     if (!e) return null;
     const sw = savedWeights[`${w.id}_${e.id}`];
-    const wgt = sw || e.weight || 0;
-    return { week: w.id, label: w.label, weight: wgt, saved: sw != null, sets: e.sets, reps: e.reps };
+    const wgt = sw?.weight || e.weight || 0;
+    return { week: w.id, label: w.label, weight: wgt, saved: sw?.weight != null, sets: e.sets, reps: sw?.reps || e.reps };
   }).filter(Boolean);
 
   const maxW = Math.max(...entries.map(e => e.weight), 1);
