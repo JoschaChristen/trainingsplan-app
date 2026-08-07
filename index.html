@@ -28,6 +28,8 @@
   --green-100: #d1ede3;
   --amber: #f59e0b;
   --red: #ef4444;
+  --purple: #6d28d9;
+  --purple-light: #ede9fe;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -40,7 +42,8 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .view{display:none;padding:16px 16px calc(var(--nav-height) + 16px);overflow-y:auto;flex:1}
 .view.active{display:block}
 /* Cards */
-.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);transition:transform 0.1s}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);transition:opacity 0.15s}
+.card.skipped-card{opacity:0.6}
 .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .card-title{font-weight:600;font-size:15px;color:var(--text)}
 .card-subtitle{font-size:12px;color:var(--text-secondary);margin-top:1px}
@@ -53,34 +56,48 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .week-chip.active.deload{background:var(--amber);border-color:var(--amber);color:#fff}
 .week-chip.test{border-color:var(--primary);border-style:dashed}
 .week-chip.completed{background:var(--primary-light);border-color:var(--primary);color:var(--primary)}
-/* Exercise rows */
+/* Exercise rows (Übersicht) */
 .exercise{padding:14px 0;border-bottom:1px solid var(--border)}
 .exercise:last-child{border-bottom:none}
-.exercise .top{display:flex;justify-content:space-between;align-items:flex-start}
+.exercise .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .exercise .name{font-weight:600;font-size:15px}
 .exercise .detail{font-size:13px;color:var(--text-secondary);margin-top:2px}
 .exercise .badge{font-size:11px;padding:2px 8px;border-radius:6px;background:var(--primary-light);color:var(--primary);font-weight:500;display:inline-block;margin-top:4px}
 .exercise .badge.deload-badge{background:#fef3c7;color:#92400e}
 .exercise .badge.test-badge{background:#dbeafe;color:#1e40af}
-/* Per-set rows (weight/reps individually per set) */
+.exercise .badge.skip-badge{background:#f3f4f6;color:var(--text-muted)}
+.exercise .badge.sub-badge{background:var(--purple-light);color:var(--purple)}
+/* Per-set rows (weight/reps individually per set, variable count) */
 .set-lines{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .set-line{display:flex;align-items:center;gap:8px}
-.set-line-label{font-size:12px;color:var(--text-secondary);width:62px;flex-shrink:0}
-.weight-input{width:72px;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-align:center;outline:none;background:var(--bg);color:var(--text);transition:border-color 0.15s}
+.set-line-label{font-size:12px;color:var(--text-secondary);width:58px;flex-shrink:0}
+.weight-input{width:68px;padding:8px 8px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-align:center;outline:none;background:var(--bg);color:var(--text);transition:border-color 0.15s}
 .weight-input:focus{border-color:var(--primary)}
-.reps-input{width:48px;padding:8px 6px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;text-align:center;outline:none;background:var(--bg);color:var(--text);transition:border-color 0.15s}
+.reps-input{width:46px;padding:8px 6px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;text-align:center;outline:none;background:var(--bg);color:var(--text);transition:border-color 0.15s}
 .reps-input:focus{border-color:var(--primary)}
 .weight-unit{font-size:13px;color:var(--text-secondary);font-weight:500}
 .mult{font-size:13px;color:var(--text-secondary)}
-.set-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);cursor:pointer;flex-shrink:0;margin-left:auto;transition:all 0.15s}
+.set-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);cursor:pointer;flex-shrink:0;transition:all 0.15s}
 .set-check.done{background:var(--primary);border-color:var(--primary)}
+.row-remove{width:22px;height:22px;border:none;background:transparent;color:var(--text-muted);font-size:13px;cursor:pointer;flex-shrink:0;line-height:1;margin-left:auto;padding:0}
+.row-remove:active{color:var(--red)}
 .lift-btn{padding:6px 14px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s}
 .lift-btn.primary{background:var(--primary);color:#fff}
 .lift-btn.primary:active{background:var(--primary-dark)}
 .lift-btn.saved{background:var(--green-100);color:var(--primary-dark)}
 .lift-btn.ghost{background:transparent;border:1.5px solid var(--border);color:var(--text-secondary)}
 .lift-btn.ghost:active{background:var(--bg)}
-.ex-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px}
+.lift-btn.small{padding:5px 10px;font-size:12px}
+.ex-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.ex-actions-left{display:flex;gap:6px}
+/* Status editor (Anders trainiert?) */
+.status-toggle-link{font-size:12px;color:var(--primary);cursor:pointer;margin-top:8px;display:inline-block;font-weight:500}
+.status-panel{margin-top:8px;padding-top:10px;border-top:1px dashed var(--border)}
+.status-chips{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.status-chip{padding:5px 12px;border-radius:16px;font-size:12px;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);cursor:pointer;transition:all 0.15s}
+.status-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.sub-name-input,.note-input{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;margin-bottom:6px;background:var(--bg);color:var(--text);outline:none}
+.sub-name-input:focus,.note-input:focus{border-color:var(--primary)}
 /* Stats cards */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .stat-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center}
@@ -92,10 +109,6 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .progress-item{background:var(--card);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;box-shadow:var(--shadow);cursor:pointer}
 .progress-item .name{font-weight:600;font-size:14px}
 .progress-item .weeks{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
-.progress-dot{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--green-100);color:var(--primary);position:relative}
-.progress-dot.highlight{background:var(--primary);color:#fff}
-.progress-dot.empty{background:var(--border);color:var(--text-muted)}
-.progress-dot .kg-label{position:absolute;top:-14px;font-size:9px;font-weight:400;color:var(--text-muted);white-space:nowrap}
 /* Bottom nav */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;height:var(--nav-height);padding-bottom:env(safe-area-inset-bottom,0)}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--text-muted);transition:color 0.15s;padding:6px 0}
@@ -110,7 +123,6 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
 .modal-title{font-size:18px;font-weight:700;margin-bottom:12px}
 .modal-close{float:right;border:none;background:none;font-size:20px;color:var(--text-secondary);cursor:pointer}
-.progress-bar{border:none;background:var(--bg);border-radius:4px;height:6px;width:100%;margin:4px 0}
 .bar-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)}
 .bar-row:last-child{border-bottom:none}
 .bar-row .w-label{font-size:12px;color:var(--text-secondary);width:60px}
@@ -118,7 +130,6 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .bar-fill{flex:1;margin:0 10px}
 /* Empty state */
 .empty-state{padding:40px 20px;text-align:center;color:var(--text-muted)}
-.empty-state svg{width:48px;height:48px;margin-bottom:12px;opacity:0.4}
 .empty-state p{font-size:14px}
 /* Reset button */
 .reset-btn{position:fixed;bottom:80px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;color:var(--text-muted);font-size:18px;transition:all 0.15s}
@@ -197,9 +208,9 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 <script src="data.js"></script>
 <script>
 // ========== IndexedDB ==========
-// Ab DB_VER 3: 'setLogs' speichert pro Satz ein eigenes {weight, reps, done}
-// statt einem einzigen Wert pro Übung. Alte Stores ('weights','sets') werden
-// beim Upgrade entfernt.
+// setLogs speichert pro Übung/Woche einen Datensatz:
+// { id, week, exerciseId, sets:[{weight,reps,done}], status:'planned'|'skipped'|'substituted',
+//   substituteName: string|null, note: string|null, updatedAt }
 const DB_NAME = 'TrainingsPlan';
 const DB_VER = 3;
 
@@ -221,11 +232,10 @@ function openDB() {
   });
 }
 
-// sets: Array von { weight: number|null, reps: number|null, done: boolean }, ein Eintrag pro Satz
-async function saveSetLog(weekId, exerciseId, sets) {
+async function saveSetLog(weekId, exerciseId, record) {
   const db = await openDB();
   const tx = db.transaction('setLogs', 'readwrite');
-  tx.objectStore('setLogs').put({ id: `${weekId}_${exerciseId}`, week: weekId, exerciseId, sets, updatedAt: Date.now() });
+  tx.objectStore('setLogs').put({ id: `${weekId}_${exerciseId}`, week: weekId, exerciseId, ...record, updatedAt: Date.now() });
   return new Promise(r => { tx.oncomplete = () => r(); });
 }
 
@@ -251,7 +261,9 @@ async function resetAllData() {
 // ========== App State ==========
 let currentView = 'overview';
 let currentWeek = parseInt(localStorage.getItem('tp_current_week')) || 1;
-let savedLogs = {}; // key `${week}_${exerciseId}` -> { sets: [{weight,reps,done}, ...] }
+let savedLogs = {}; // key `${week}_${exerciseId}` -> full record (sets, status, substituteName, note)
+let rowTokenCounter = 0;
+function nextRowToken() { return `rt${rowTokenCounter++}`; }
 
 async function refreshData() {
   const logs = await loadAllSetLogs();
@@ -259,12 +271,13 @@ async function refreshData() {
   logs.forEach(l => { savedLogs[`${l.week}_${l.exerciseId}`] = l; });
 }
 
-// Liefert für eine Übung die effektiven Satz-Einträge: gespeicherte Werte,
+// Effektive Satz-Einträge: gespeicherte Werte (inkl. variabler Satzanzahl),
 // sonst Plan-Default (gleiches Gewicht/Reps für alle Sätze als Startwert).
 function getSetEntries(week, e) {
   const key = `${week.id}_${e.id}`;
-  const saved = savedLogs[key]?.sets;
-  const total = e.sets || 1;
+  const savedRec = savedLogs[key];
+  const saved = savedRec && savedRec.sets;
+  const total = (saved && saved.length) ? saved.length : (e.sets || 1);
   const entries = [];
   for (let i = 0; i < total; i++) {
     const s = saved && saved[i];
@@ -277,8 +290,23 @@ function getSetEntries(week, e) {
   return entries;
 }
 
+function getExerciseStatus(week, e) {
+  const rec = savedLogs[`${week.id}_${e.id}`];
+  return {
+    status: (rec && rec.status) || 'planned',
+    substituteName: (rec && rec.substituteName) || null,
+    note: (rec && rec.note) || null
+  };
+}
+
 function allSetsSaved(entries) {
   return entries.length > 0 && entries.every(s => s.weight != null);
+}
+
+function exerciseIsComplete(week, e) {
+  const status = getExerciseStatus(week, e);
+  if (status.status === 'skipped') return true; // nichts zu loggen
+  return allSetsSaved(getSetEntries(week, e));
 }
 
 // ========== Router ==========
@@ -306,7 +334,7 @@ function renderOverview() {
   const week = PLAN.weeks.find(w => w.id === currentWeek) || PLAN.weeks[0];
 
   const totalEx = week.exercises.length;
-  const savedCount = week.exercises.filter(e => allSetsSaved(getSetEntries(week, e))).length;
+  const savedCount = week.exercises.filter(e => exerciseIsComplete(week, e)).length;
 
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card"><div class="value">${week.id}/8</div><div class="label">Aktuelle Woche</div></div>
@@ -314,6 +342,7 @@ function renderOverview() {
   `;
 
   const exHtml = week.exercises.map(e => {
+    const status = getExerciseStatus(week, e);
     const entries = getSetEntries(week, e);
     const loggedWeights = entries.map(s => s.weight).filter(w => w != null);
     let weightStr;
@@ -323,9 +352,22 @@ function renderOverview() {
     } else {
       weightStr = e.weight ? `${e.weight} kg` : 'BW';
     }
+
+    let displayName = e.name;
+    let nameStyle = '';
+    let badge = '';
+    if (status.status === 'skipped') {
+      nameStyle = 'text-decoration:line-through;color:var(--text-muted)';
+      badge = '<span class="badge skip-badge">Ausgelassen</span>';
+    } else if (status.status === 'substituted') {
+      displayName = `<span style="text-decoration:line-through;color:var(--text-muted)">${e.name}</span> → ${status.substituteName || '…'}`;
+      badge = '<span class="badge sub-badge">Ersetzt</span>';
+    }
+
     return `<div class="exercise">
-      <div class="top"><span class="name">${e.name}</span><span style="font-weight:600;color:var(--primary)">${e.sets}×${e.reps || '—'}</span></div>
-      <div class="detail">${weightStr}${e.desc ? ' · ' + e.desc : ''}</div>
+      <div class="top"><span class="name" style="${nameStyle}">${displayName}</span><span style="font-weight:600;color:var(--primary)">${e.sets}×${e.reps || '—'}</span></div>
+      <div class="detail">${status.status === 'skipped' ? (status.note || 'ausgelassen') : weightStr}${e.desc && status.status === 'planned' ? ' · ' + e.desc : ''}</div>
+      ${badge}
     </div>`;
   }).join('');
 
@@ -346,7 +388,7 @@ function renderTraining() {
   const sel = document.getElementById('weekSelector');
   if (!trainingInitialized) {
     sel.innerHTML = PLAN.weeks.map(w => {
-      const done = w.exercises.every(e => allSetsSaved(getSetEntries(w, e)));
+      const done = w.exercises.every(e => exerciseIsComplete(w, e));
       let cls = 'week-chip';
       if (w.id === currentWeek) cls += ' active';
       if (w.isDeload) cls += ' deload';
@@ -380,105 +422,227 @@ function renderWeek(weekId) {
   for (const e of week.exercises) {
     const entries = getSetEntries(week, e);
     const total = entries.length;
+    const status = getExerciseStatus(week, e);
+    const isSkipped = status.status === 'skipped';
+    const isSub = status.status === 'substituted';
+    const showSets = !isSkipped;
 
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'card' + (isSkipped ? ' skipped-card' : '');
     card.style.marginBottom = '10px';
 
-    let badgeHtml = '';
-    if (week.isDeload) badgeHtml = '<span class="badge deload-badge">Deload</span>';
-    else if (week.isTest) badgeHtml = '<span class="badge test-badge">Test</span>';
-    else if (e.isTopSet) badgeHtml = '<span class="badge">Top Set</span>';
+    let planBadge = '';
+    if (week.isDeload) planBadge = '<span class="badge deload-badge">Deload</span>';
+    else if (week.isTest) planBadge = '<span class="badge test-badge">Test</span>';
+    else if (e.isTopSet) planBadge = '<span class="badge">Top Set</span>';
 
-    if (allSetsSaved(entries)) {
+    let statusBadge = '';
+    if (isSkipped) statusBadge = '<span class="badge skip-badge">Ausgelassen</span>';
+    else if (isSub) statusBadge = '<span class="badge sub-badge">Ersetzt</span>';
+
+    let nameHtml;
+    if (isSkipped) {
+      nameHtml = `<span class="name" style="text-decoration:line-through;color:var(--text-muted)">${e.name}</span>`;
+    } else if (isSub) {
+      nameHtml = `<span class="name" style="text-decoration:line-through;color:var(--text-muted)">${e.name}</span> <span class="name" id="subdisp_${week.id}_${e.id}">→ ${status.substituteName || '…'}</span>`;
+    } else {
+      nameHtml = `<span class="name">${e.name}</span>`;
+    }
+
+    if (showSets && allSetsSaved(entries)) {
       card.style.borderLeft = '3px solid var(--primary)';
     }
 
     let rowsHtml = '';
-    for (let i = 0; i < total; i++) {
-      const se = entries[i];
-      const wVal = se.weight != null ? se.weight : (e.weight || '');
-      const rVal = se.reps != null ? se.reps : (e.reps || '');
-      const label = e.isTopSet ? (i === 0 ? 'Top Set' : `Backoff ${i}`) : `Satz ${i + 1}`;
-      rowsHtml += `
-        <div class="set-line">
-          <span class="set-line-label">${label}</span>
-          <input type="number" class="weight-input" id="w_${week.id}_${e.id}_${i}" value="${wVal}" placeholder="${e.weight || 0}" step="0.5" min="0" inputmode="decimal">
-          <span class="weight-unit">kg</span>
-          <span class="mult">×</span>
-          <input type="number" class="reps-input" id="r_${week.id}_${e.id}_${i}" value="${rVal}" placeholder="${e.reps || ''}" step="1" min="0" inputmode="numeric">
-          <span class="weight-unit">WH</span>
-          <div class="set-check ${se.done ? 'done' : ''}" onclick="toggleSetDone(${week.id},'${e.id}',${i},${total})" title="Satz erledigt"></div>
-        </div>`;
+    if (showSets) {
+      for (let i = 0; i < total; i++) {
+        const se = entries[i];
+        const wVal = se.weight != null ? se.weight : (e.weight || '');
+        const rVal = se.reps != null ? se.reps : (e.reps || '');
+        const label = e.isTopSet ? (i === 0 ? 'Top Set' : `Backoff ${i}`) : `Satz ${i + 1}`;
+        const token = `${week.id}_${e.id}_${i}`;
+        rowsHtml += `
+          <div class="set-line" data-row="${token}">
+            <span class="set-line-label">${label}</span>
+            <input type="number" class="weight-input" id="w_${token}" value="${wVal}" placeholder="${e.weight || 0}" step="0.5" min="0" inputmode="decimal">
+            <span class="weight-unit">kg</span>
+            <span class="mult">×</span>
+            <input type="number" class="reps-input" id="r_${token}" value="${rVal}" placeholder="${e.reps || ''}" step="1" min="0" inputmode="numeric">
+            <span class="weight-unit">WH</span>
+            <div class="set-check ${se.done ? 'done' : ''}" onclick="toggleRowDone(${week.id},'${e.id}',this)" title="Satz erledigt"></div>
+            <button class="row-remove" onclick="removeSetRow(${week.id},'${e.id}',this)" title="Satz entfernen">✕</button>
+          </div>`;
+      }
     }
+
+    const panelOpenDefault = status.status !== 'planned';
 
     card.innerHTML = `
       <div class="exercise" style="padding:0;border:none">
         <div class="top">
-          <div><span class="name">${e.name}</span> ${badgeHtml}</div>
+          <div>${nameHtml} ${planBadge}${statusBadge}</div>
           <span style="font-weight:600;color:var(--primary)">${total} Sätze</span>
         </div>
         <div class="detail">${e.desc || ''}${e.rest ? ' · Pause: ' + e.rest : ''}</div>
-        <div class="set-lines">${rowsHtml}</div>
-        <div class="ex-actions">
-          <button class="lift-btn ghost" onclick="fillAllSets(${week.id},'${e.id}',${total})">Alle gleich</button>
-          <button class="lift-btn ${allSetsSaved(entries) ? 'saved' : 'primary'}" id="b_${week.id}_${e.id}" onclick="saveEx(${week.id},'${e.id}',${total})">${allSetsSaved(entries) ? '✓ Gespeichert' : 'Speichern'}</button>
+        ${showSets ? `
+          <div class="set-lines" id="setlines_${week.id}_${e.id}" data-topset="${e.isTopSet ? '1' : '0'}">${rowsHtml}</div>
+          <div class="ex-actions">
+            <div class="ex-actions-left">
+              <button class="lift-btn ghost small" onclick="addSetRow(${week.id},'${e.id}')">+ Satz</button>
+              <button class="lift-btn ghost small" onclick="fillAllSets(${week.id},'${e.id}')">Alle gleich</button>
+            </div>
+            <button class="lift-btn ${allSetsSaved(entries) ? 'saved' : 'primary'}" id="b_${week.id}_${e.id}" onclick="saveEx(${week.id},'${e.id}')">${allSetsSaved(entries) ? '✓ Gespeichert' : 'Speichern'}</button>
+          </div>
+        ` : ''}
+        <div class="status-toggle-link" onclick="toggleStatusEditor(${week.id},'${e.id}')">⋯ Anders trainiert?</div>
+        <div class="status-panel" id="statusPanel_${week.id}_${e.id}" style="display:${panelOpenDefault ? 'block' : 'none'}">
+          <div class="status-chips">
+            <button class="status-chip ${status.status === 'planned' ? 'active' : ''}" onclick="setExStatus(${week.id},'${e.id}','planned')">Geplant</button>
+            <button class="status-chip ${status.status === 'skipped' ? 'active' : ''}" onclick="setExStatus(${week.id},'${e.id}','skipped')">Ausgelassen</button>
+            <button class="status-chip ${status.status === 'substituted' ? 'active' : ''}" onclick="setExStatus(${week.id},'${e.id}','substituted')">Ersetzt</button>
+          </div>
+          <input type="text" class="sub-name-input" id="subname_${week.id}_${e.id}" placeholder="z.B. Negative Pull-ups" value="${status.substituteName || ''}" style="display:${isSub ? 'block' : 'none'}" oninput="onSubNameInput(${week.id},'${e.id}',this)">
+          <input type="text" class="note-input" id="note_${week.id}_${e.id}" placeholder="Notiz (optional), z.B. Grund" value="${status.note || ''}" style="display:${status.status !== 'planned' ? 'block' : 'none'}" oninput="onNoteInput(${week.id},'${e.id}',this)">
         </div>
       </div>`;
     cont.appendChild(card);
   }
 }
 
-// Übernimmt Satz 1 (Gewicht + Reps) in alle weiteren Satz-Zeilen dieser Übung.
-// Nur eine Erleichterung für die Eingabe – gespeichert wird erst mit "Speichern".
-function fillAllSets(weekId, exerciseId, total) {
-  const w0 = document.getElementById(`w_${weekId}_${exerciseId}_0`).value;
-  const r0 = document.getElementById(`r_${weekId}_${exerciseId}_0`).value;
-  for (let i = 1; i < total; i++) {
-    const wi = document.getElementById(`w_${weekId}_${exerciseId}_${i}`);
-    const ri = document.getElementById(`r_${weekId}_${exerciseId}_${i}`);
-    if (wi) wi.value = w0;
-    if (ri) ri.value = r0;
-  }
+// ---------- Sätze: hinzufügen / entfernen / gleich machen ----------
+function addSetRow(weekId, exerciseId) {
+  const container = document.getElementById(`setlines_${weekId}_${exerciseId}`);
+  if (!container) return;
+  const token = nextRowToken();
+  const div = document.createElement('div');
+  div.className = 'set-line';
+  div.dataset.row = token;
+  div.innerHTML = `
+    <span class="set-line-label"></span>
+    <input type="number" class="weight-input" id="w_${token}" value="" placeholder="0" step="0.5" min="0" inputmode="decimal">
+    <span class="weight-unit">kg</span>
+    <span class="mult">×</span>
+    <input type="number" class="reps-input" id="r_${token}" value="" placeholder="" step="1" min="0" inputmode="numeric">
+    <span class="weight-unit">WH</span>
+    <div class="set-check" onclick="toggleRowDone(${weekId},'${exerciseId}',this)" title="Satz erledigt"></div>
+    <button class="row-remove" onclick="removeSetRow(${weekId},'${exerciseId}',this)" title="Satz entfernen">✕</button>`;
+  container.appendChild(div);
+  relabelRows(weekId, exerciseId);
+  persistExercise(weekId, exerciseId);
+}
+
+function removeSetRow(weekId, exerciseId, btnEl) {
+  const container = document.getElementById(`setlines_${weekId}_${exerciseId}`);
+  if (!container) return;
+  if (container.children.length <= 1) { showToast('Mindestens 1 Satz nötig'); return; }
+  btnEl.closest('.set-line').remove();
+  relabelRows(weekId, exerciseId);
+  persistExercise(weekId, exerciseId);
+}
+
+function relabelRows(weekId, exerciseId) {
+  const container = document.getElementById(`setlines_${weekId}_${exerciseId}`);
+  if (!container) return;
+  const isTop = container.dataset.topset === '1';
+  [...container.children].forEach((row, i) => {
+    const label = row.querySelector('.set-line-label');
+    if (label) label.textContent = isTop ? (i === 0 ? 'Top Set' : `Backoff ${i}`) : `Satz ${i + 1}`;
+  });
+}
+
+function fillAllSets(weekId, exerciseId) {
+  const container = document.getElementById(`setlines_${weekId}_${exerciseId}`);
+  if (!container) return;
+  const rows = [...container.children];
+  if (rows.length < 2) return;
+  const w0 = rows[0].querySelector('.weight-input').value;
+  const r0 = rows[0].querySelector('.reps-input').value;
+  rows.slice(1).forEach(row => {
+    row.querySelector('.weight-input').value = w0;
+    row.querySelector('.reps-input').value = r0;
+  });
   showToast('Werte übernommen – nicht vergessen zu speichern');
 }
 
-async function saveEx(weekId, exerciseId, total) {
+// ---------- Speichern / Persistenz ----------
+function collectExerciseSets(weekId, exerciseId) {
+  const container = document.getElementById(`setlines_${weekId}_${exerciseId}`);
+  if (!container) return null;
+  return [...container.children].map(row => {
+    const w = parseFloat(row.querySelector('.weight-input').value);
+    const r = parseInt(row.querySelector('.reps-input').value);
+    const done = row.querySelector('.set-check').classList.contains('done');
+    return { weight: isNaN(w) ? null : w, reps: isNaN(r) ? null : r, done };
+  });
+}
+
+async function persistExercise(weekId, exerciseId, extra) {
   const key = `${weekId}_${exerciseId}`;
-  const prevSets = savedLogs[key]?.sets || [];
-  const sets = [];
-  let anyValid = false;
+  const prev = savedLogs[key] || {};
+  const collected = collectExerciseSets(weekId, exerciseId);
+  const sets = collected !== null ? collected : (prev.sets || []);
+  const status = (extra && extra.status !== undefined) ? extra.status : (prev.status || 'planned');
+  const substituteName = (extra && extra.substituteName !== undefined) ? extra.substituteName : (prev.substituteName || null);
+  const note = (extra && extra.note !== undefined) ? extra.note : (prev.note || null);
+  const record = { sets, status, substituteName, note };
+  await saveSetLog(weekId, exerciseId, record);
+  savedLogs[key] = record;
+  return record;
+}
 
-  for (let i = 0; i < total; i++) {
-    const wEl = document.getElementById(`w_${weekId}_${exerciseId}_${i}`);
-    const rEl = document.getElementById(`r_${weekId}_${exerciseId}_${i}`);
-    const w = parseFloat(wEl.value);
-    const r = parseInt(rEl.value);
-    const prevDone = !!(prevSets[i] && prevSets[i].done);
-    sets.push({ weight: isNaN(w) ? null : w, reps: isNaN(r) ? null : r, done: prevDone });
-    if (!isNaN(w) && w > 0) anyValid = true;
-  }
-
-  if (!anyValid) { showToast('Bitte mind. ein gültiges Gewicht eingeben'); return; }
-
-  await saveSetLog(weekId, exerciseId, sets);
-  savedLogs[key] = { sets };
-
+async function saveEx(weekId, exerciseId) {
+  const rec = await persistExercise(weekId, exerciseId);
   const btn = document.getElementById(`b_${weekId}_${exerciseId}`);
-  btn.textContent = '✓ Gespeichert';
-  btn.className = 'lift-btn saved';
+  if (btn) {
+    const done = allSetsSaved(rec.sets);
+    btn.textContent = done ? '✓ Gespeichert' : 'Gespeichert';
+    btn.className = done ? 'lift-btn saved' : 'lift-btn saved';
+  }
   showToast('✓ Gespeichert');
   renderOverview();
 }
 
-async function toggleSetDone(weekId, exerciseId, idx, total) {
+async function toggleRowDone(weekId, exerciseId, checkEl) {
+  checkEl.classList.toggle('done');
+  const rec = await persistExercise(weekId, exerciseId);
+  const btn = document.getElementById(`b_${weekId}_${exerciseId}`);
+  if (btn) {
+    const done = allSetsSaved(rec.sets);
+    btn.className = done ? 'lift-btn saved' : 'lift-btn primary';
+    btn.textContent = done ? '✓ Gespeichert' : 'Speichern';
+  }
+}
+
+// ---------- Status: Geplant / Ausgelassen / Ersetzt ----------
+function toggleStatusEditor(weekId, exerciseId) {
+  const panel = document.getElementById(`statusPanel_${weekId}_${exerciseId}`);
+  if (!panel) return;
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+async function setExStatus(weekId, exerciseId, status) {
   const key = `${weekId}_${exerciseId}`;
-  const current = (savedLogs[key]?.sets || []).slice();
-  while (current.length < total) current.push({ weight: null, reps: null, done: false });
-  current[idx] = { ...current[idx], done: !current[idx].done };
-  await saveSetLog(weekId, exerciseId, current);
-  savedLogs[key] = { sets: current };
+  const prev = savedLogs[key] || {};
+  const substituteName = status === 'substituted' ? (prev.substituteName || '') : null;
+  await persistExercise(weekId, exerciseId, { status, substituteName, note: prev.note || null });
   renderWeek(weekId);
+  renderOverview();
+}
+
+function onSubNameInput(weekId, exerciseId, inputEl) {
+  clearTimeout(inputEl._deb);
+  inputEl._deb = setTimeout(async () => {
+    await persistExercise(weekId, exerciseId, { substituteName: inputEl.value || null });
+    const disp = document.getElementById(`subdisp_${weekId}_${exerciseId}`);
+    if (disp) disp.textContent = inputEl.value ? ('→ ' + inputEl.value) : '→ …';
+  }, 400);
+}
+
+function onNoteInput(weekId, exerciseId, inputEl) {
+  clearTimeout(inputEl._deb);
+  inputEl._deb = setTimeout(async () => {
+    await persistExercise(weekId, exerciseId, { note: inputEl.value || null });
+  }, 400);
 }
 
 // ========== Progress ==========
