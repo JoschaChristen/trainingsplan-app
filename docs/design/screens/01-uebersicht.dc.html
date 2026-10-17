@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<title>Übersicht</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,700;1,800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A8D5F7}a:hover{color:#D4EBFC}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0A1628; font-family: 'Barlow', sans-serif; color: #EEF5FC; overflow: hidden">
+<main style="flex: 1; overflow-y: auto; padding: 26px 18px 22px; display: flex; flex-direction: column; gap: 16px">
+
+<header style="display: flex; justify-content: space-between; align-items: flex-end">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; font-weight: 600; color: #9FB6CC; letter-spacing: 0.04em; text-transform: uppercase">Freitag, 16. Oktober</span>
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 40px; line-height: 1; text-transform: uppercase">Hallo Joscha</h1>
+</div>
+<a href="CheckIn.dc.html" aria-label="Wochen-Check-in öffnen, 3 neue Vorschläge" style="position: relative; width: 44px; height: 44px; border-radius: 14px; background: #11223A; border: 1px solid #22405F; color: #A8D5F7; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.9 4.6 4.6 1.9-4.6 1.9-1.9 4.6-1.9-4.6-4.6-1.9 4.6-1.9z"></path><path d="M18.5 15.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z"></path></svg>
+<span aria-hidden="true" style="position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px; border-radius: 10px; background: #C8F24A; color: #0F2A47; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center">3</span>
+</a>
+</header>
+
+<a href="Zyklus.dc.html" style="text-decoration: none; color: #EEF5FC; background: #11223A; border: 1px solid #22405F; border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; font-weight: 600; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.06em">Aktueller Zyklus</span>
+<span style="font-size: 18px; font-weight: 700">Kraftblock Herbst</span>
+</div>
+<span style="background: #C8F24A; color: #0F2A47; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 17px; padding: 4px 12px; transform: skewX(-12deg); border-radius: 4px">WOCHE 3/8</span>
+</div>
+<div aria-hidden="true" style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px">
+<sc-for list="{{weeks}}" as="w" hint-placeholder-count="8">
+<span style="{{w.style}}"></span>
+</sc-for>
+</div>
+<span style="font-size: 13px; color: #9FB6CC">Deload in Woche 8 · Ende 22.11.2026</span>
+</a>
+
+<section style="background: #A8D5F7; color: #0F2A47; border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em">Heute · Tag A</span>
+<span style="font-size: 13px; font-weight: 600">ca. 70 Min.</span>
+</div>
+<h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 30px; line-height: 1; text-transform: uppercase">Unterkörper + Handstand</h2>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; justify-content: space-between; gap: 12px; font-size: 15px"><span style="font-weight: 600">Back Squat</span><span style="font-weight: 500">5 × 5 · 102.5 kg</span></li>
+<li style="display: flex; justify-content: space-between; gap: 12px; font-size: 15px"><span style="font-weight: 600">Romanian Deadlift</span><span style="font-weight: 500">3 × 8 · 80 kg</span></li>
+<li style="display: flex; justify-content: space-between; gap: 12px; font-size: 15px"><span style="font-weight: 600">Handstand an der Wand</span><span style="font-weight: 500">5 × 40 s</span></li>
+</ol>
+<a href="Training.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 54px; border-radius: 16px; background: #0F2A47; color: #C8F24A; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 22px; text-transform: uppercase; text-decoration: none; letter-spacing: 0.02em">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"></path></svg>
+Training starten
+</a>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 22px; text-transform: uppercase">1RM</h2>
+<a href="Fortschritt.dc.html" style="font-size: 13px; font-weight: 600; text-decoration: none">Alle Lifts</a>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{lifts}}" as="l" hint-placeholder-count="4">
+<a href="Fortschritt.dc.html" style="text-decoration: none; color: #EEF5FC; background: #11223A; border: 1px solid #22405F; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; font-weight: 600; color: #9FB6CC">{{l.name}}</span>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 700; font-size: 34px; line-height: 1">{{l.val}}<span style="font-size: 16px; font-weight: 600; color: #9FB6CC"> kg</span></span>
+<svg width="130" height="30" viewBox="0 0 130 30" fill="none" aria-hidden="true" style="margin-top: 4px">
+<path d="{{l.spark}}" stroke="{{l.color}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span style="{{l.deltaStyle}}">{{l.delta}}</span>
+</a>
+</sc-for>
+</div>
+</section>
+
+<a href="Skills.dc.html" style="text-decoration: none; color: #EEF5FC; background: #11223A; border: 1px solid #22405F; border-radius: 22px; padding: 16px 18px; display: flex; align-items: center; gap: 14px">
+<div style="width: 52px; height: 52px; flex: none; border-radius: 16px; background: #183050; color: #A8D5F7; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="19.5" r="2"></circle><path d="M12 17V9M12 9l-4-5M12 9l4-5M9 13h6"></path></svg>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between">
+<span style="font-weight: 700; font-size: 16px">Handstand</span>
+<span style="font-size: 13px; color: #9FB6CC">Stufe 4 von 6</span>
+</div>
+<div aria-hidden="true" style="height: 8px; border-radius: 4px; background: #22405F; overflow: hidden"><div style="width: 60%; height: 8px; background: #C8F24A; border-radius: 4px"></div></div>
+<span style="font-size: 13px; color: #9FB6CC">Frei gehalten: 18 von 30 s · Bestwert diese Woche</span>
+</div>
+</a>
+
+</main>
+
+<nav aria-label="Hauptnavigation" style="display: flex; justify-content: space-around; padding: 8px 4px 24px; background: #0D1C31; border-top: 1px solid #22405F">
+<a href="Main.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 700; color: #A8D5F7">
+<span aria-hidden="true" style="width: 22px; height: 3px; border-radius: 2px; background: #C8F24A"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg>
+Übersicht
+</a>
+<a href="Training.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>
+Training
+</a>
+<a href="Zyklus.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>
+Zyklen
+</a>
+<a href="Fortschritt.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5h16M5 15l4-4 3 3 6.5-7"></path></svg>
+Fortschritt
+</a>
+<a href="Uebung.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6.5h11M9 12h11M9 17.5h7M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"></path></svg>
+Übungen
+</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+function spark(v) {
+  var lo = Math.min.apply(null, v), hi = Math.max.apply(null, v), span = Math.max(1, hi - lo);
+  return v.map(function (x, i) {
+    return (i === 0 ? 'M' : 'L') + (2 + i * 126 / (v.length - 1)).toFixed(1) + ' ' + (27 - (x - lo) / span * 24).toFixed(1);
+  }).join(' ');
+}
+class Component extends DCLogic {
+  renderVals() {
+    var weeks = [];
+    for (var i = 1; i <= 8; i++) {
+      var bg = i < 3 ? '#A8D5F7' : (i === 3 ? '#C8F24A' : '#22405F');
+      weeks.push({ style: 'height: 8px; border-radius: 3px; transform: skewX(-20deg); background: ' + bg + ';' });
+    }
+    var up = 'font-size: 12px; font-weight: 700; color: #C8F24A;';
+    var flat = 'font-size: 12px; font-weight: 700; color: #9FB6CC;';
+    var lifts = [
+      { name: 'Back Squat', val: 128, v: [116, 118, 120, 121, 123, 125, 127, 128], delta: '+12 kg seit März', up: true },
+      { name: 'Deadlift', val: 157, v: [147, 148, 150, 151, 153, 154, 156, 157], delta: '+10 kg seit März', up: true },
+      { name: 'Bench Press', val: 92, v: [89, 90, 91, 92, 92, 92, 92, 92], delta: 'Plateau seit Juli', up: false },
+      { name: 'Strict Press', val: 56, v: [50, 51, 51, 53, 53, 55, 55, 56], delta: '+6 kg seit März', up: true }
+    ].map(function (l) {
+      return {
+        name: l.name, val: l.val, delta: l.delta,
+        spark: spark(l.v),
+        color: l.up ? '#A8D5F7' : '#5F7C99',
+        deltaStyle: l.up ? up : flat
+      };
+    });
+    return { weeks: weeks, lifts: lifts };
+  }
+}
+</script>
+</body>
+</html>

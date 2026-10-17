@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<title>Wochen-Check-in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,700;1,800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A8D5F7}a:hover{color:#D4EBFC}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0A1628; font-family: 'Barlow', sans-serif; color: #EEF5FC; overflow: hidden">
+
+<header style="padding: 24px 18px 12px; display: flex; align-items: center; gap: 12px">
+<a href="Main.dc.html" aria-label="Zurück zur Übersicht" style="width: 44px; height: 44px; flex: none; border-radius: 14px; border: 1px solid #22405F; background: #11223A; color: #EEF5FC; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+</a>
+<div style="display: flex; flex-direction: column">
+<span style="font-size: 12px; font-weight: 700; color: #A8D5F7; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.9 4.6 4.6 1.9-4.6 1.9-1.9 4.6-1.9-4.6-4.6-1.9 4.6-1.9z"></path></svg>
+KI-Auswertung
+</span>
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 30px; line-height: 1.05; text-transform: uppercase">Check-in Woche 2</h1>
+</div>
+</header>
+
+<main style="flex: 1; overflow-y: auto; padding: 4px 18px 18px; display: flex; flex-direction: column; gap: 12px">
+
+<section aria-label="Woche 2 in Zahlen" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="background: #11223A; border: 1px solid #22405F; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 700; font-size: 28px; line-height: 1">3/3</span>
+<span style="font-size: 12px; color: #9FB6CC">Einheiten</span>
+</div>
+<div style="background: #11223A; border: 1px solid #22405F; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 700; font-size: 28px; line-height: 1">41/43</span>
+<span style="font-size: 12px; color: #9FB6CC">Sätze geschafft</span>
+</div>
+<div style="background: #11223A; border: 1px solid #22405F; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 700; font-size: 28px; line-height: 1">7.8</span>
+<span style="font-size: 12px; color: #9FB6CC">Ø RPE letzter Satz</span>
+</div>
+</section>
+
+<p style="margin: 0; font-size: 14px; line-height: 1.45; color: #C9D8E6">Unterkörper läuft stärker als geplant, beim Bankdrücken bist du am Limit. Drei Anpassungen für Woche 3:</p>
+
+<sc-for list="{{items}}" as="it" hint-placeholder-count="3">
+<article style="{{it.cardStyle}}">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 700">{{it.name}}</h2>
+<span style="{{it.tagStyle}}">{{it.tag}}</span>
+</div>
+<span style="font-size: 13px; color: #9FB6CC">{{it.ist}}</span>
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 700; font-size: 22px; color: #7F98B2; text-decoration: line-through">{{it.from}}</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8D5F7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 26px; color: #EEF5FC">{{it.to}}</span>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 1.4; color: #C9D8E6">{{it.why}}</p>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button type="button" aria-pressed="{{it.accepted}}" onClick="{{it.accept}}" style="{{it.acceptStyle}}">Übernehmen</button>
+<button type="button" aria-pressed="{{it.rejected}}" onClick="{{it.reject}}" style="{{it.rejectStyle}}">Plan behalten</button>
+</div>
+</article>
+</sc-for>
+
+<div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: #11223A; border: 1px solid #22405F">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9FB6CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+<span style="font-size: 13px; color: #C9D8E6">Strict Press und Handstand bleiben wie geplant.</span>
+</div>
+
+<p style="margin: 0; font-size: 12px; line-height: 1.4; color: #9FB6CC">Die KI schlägt nur Änderungen vor. Kilos und 1RM rechnet die App nach Formel, gerundet auf 2.5 kg.</p>
+</main>
+
+<div style="padding: 12px 18px 26px; background: #0D1C31; border-top: 1px solid #22405F">
+<a href="Zyklus.dc.html" style="{{ctaStyle}}">{{cta}}</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var ITEMS = [
+  { id: 'bs', name: 'Back Squat', tag: 'Mehr Last', up: true, ist: 'Woche 2: 5 × 5 mit 100 kg, alle Wdh., RPE 7', from: '102.5 kg', to: '105 kg', why: 'Alle 25 Wdh. mit etwa 3 Wdh. Reserve. Eine Stufe mehr als geplant liegt im Rahmen.' },
+  { id: 'rdl', name: 'Romanian Deadlift', tag: 'Mehr Last', up: true, ist: 'Woche 2: 3 × 8 mit 77.5 kg, RPE 6', from: '80 kg', to: '85 kg', why: 'Zwei Wochen in Folge sehr locker. Der Plan unterschätzt dich hier.' },
+  { id: 'bp', name: 'Bench Press', tag: 'Halten', up: false, ist: 'Woche 2: 5 × 5 mit 70 kg, 2 Wdh. verpasst, RPE 9.5', from: '72.5 kg', to: '70 kg', why: 'Gleiches Gewicht nochmals sauber schaffen, bevor die Last steigt. Seit Juli kein Fortschritt: eine Analyse findest du unter Fortschritt.' }
+];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { choice: { bs: 'accept', rdl: null, bp: 'accept' } };
+  }
+  set(id, v) {
+    var c = Object.assign({}, this.state.choice);
+    c[id] = c[id] === v ? null : v;
+    this.setState({ choice: c });
+  }
+  renderVals() {
+    var self = this;
+    var ch = this.state.choice;
+    var btn = 'height: 44px; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;';
+    var items = ITEMS.map(function (it) {
+      var a = ch[it.id] === 'accept', r = ch[it.id] === 'reject';
+      return Object.assign({}, it, {
+        accepted: a, rejected: r,
+        accept: function () { self.set(it.id, 'accept'); },
+        reject: function () { self.set(it.id, 'reject'); },
+        cardStyle: 'background: #11223A; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 8px; border: 1.5px solid ' + (a ? '#C8F24A' : '#22405F') + ';',
+        tagStyle: 'font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 6px;' + (it.up ? ' background: #C8F24A; color: #0F2A47;' : ' background: #A8D5F7; color: #0F2A47;'),
+        acceptStyle: btn + (a ? ' background: #C8F24A; color: #0F2A47; border: 0;' : ' background: transparent; color: #EEF5FC; border: 1px solid #2B4D72;'),
+        rejectStyle: btn + (r ? ' background: #EEF5FC; color: #0F2A47; border: 0;' : ' background: transparent; color: #9FB6CC; border: 1px solid #2B4D72;')
+      });
+    });
+    var n = ITEMS.filter(function (it) { return ch[it.id] === 'accept'; }).length;
+    var cta = n === 0 ? 'Plan unverändert lassen' : (n === 1 ? '1 Anpassung übernehmen' : n + ' Anpassungen übernehmen');
+    return {
+      items: items,
+      cta: cta,
+      ctaStyle: 'display: flex; align-items: center; justify-content: center; height: 54px; border-radius: 16px; text-decoration: none; font-family: \'Barlow Condensed\', sans-serif; font-style: italic; font-weight: 800; font-size: 22px; text-transform: uppercase;' + (n ? ' background: #C8F24A; color: #0F2A47;' : ' background: #183050; color: #EEF5FC;')
+    };
+  }
+}
+</script>
+</body>
+</html>

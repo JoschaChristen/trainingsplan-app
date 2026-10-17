@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<title>Eigene Übung</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,700;1,800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A8D5F7}a:hover{color:#D4EBFC}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0A1628; font-family: 'Barlow', sans-serif; color: #EEF5FC; overflow: hidden">
+<main style="flex: 1; overflow-y: auto; padding: 26px 18px 22px; display: flex; flex-direction: column; gap: 16px">
+
+<header style="display: flex; justify-content: space-between; align-items: center">
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 40px; line-height: 1; text-transform: uppercase">Neue Übung</h1>
+<a href="Uebung.dc.html" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 700; text-decoration: none">Bibliothek</a>
+</header>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="name" style="font-size: 12px; font-weight: 700; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.05em">Name</label>
+<input id="name" type="text" value="{{name}}" onChange="{{onName}}" style="height: 52px; box-sizing: border-box; border: 1.5px solid #2B4D72; border-radius: 14px; background: #11223A; color: #EEF5FC; padding: 0 14px; font: inherit; font-size: 17px; font-weight: 600">
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span id="typ-label" style="font-size: 12px; font-weight: 700; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.05em">Wie wird erfasst?</span>
+<div role="radiogroup" aria-labelledby="typ-label" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{types}}" as="t" hint-placeholder-count="4">
+<button type="button" role="radio" aria-checked="{{t.active}}" onClick="{{t.pick}}" style="{{t.style}}">
+<span style="font-size: 15px; font-weight: 700">{{t.name}}</span>
+<span style="{{t.subStyle}}">{{t.sub}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span id="kat-label" style="font-size: 12px; font-weight: 700; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.05em">Kategorie</span>
+<div role="radiogroup" aria-labelledby="kat-label" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+<button type="button" role="radio" aria-checked="{{c.active}}" onClick="{{c.pick}}" style="{{c.style}}">{{c.name}}</button>
+</sc-for>
+</div>
+</div>
+
+<section style="background: #11223A; border: 1px solid #22405F; border-radius: 18px; padding: 4px 14px; display: flex; flex-direction: column">
+<sc-for list="{{switches}}" as="s" hint-placeholder-count="2">
+<div style="{{s.rowStyle}}">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span id="{{s.id}}" style="font-size: 15px; font-weight: 600">{{s.name}}</span>
+<span style="font-size: 12px; color: #9FB6CC">{{s.sub}}</span>
+</div>
+<button type="button" role="switch" aria-checked="{{s.on}}" aria-labelledby="{{s.id}}" onClick="{{s.toggle}}" style="{{s.trackStyle}}">
+<span aria-hidden="true" style="{{s.knobStyle}}"></span>
+</button>
+</div>
+</sc-for>
+<sc-if value="{{hasStep}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 60px; border-top: 1px solid #22405F">
+<span id="step-label" style="flex: 1; font-size: 15px; font-weight: 600">Gewichtsschritt</span>
+<div role="radiogroup" aria-labelledby="step-label" style="display: flex; background: #0A1628; border-radius: 12px; padding: 3px">
+<sc-for list="{{steps}}" as="p" hint-placeholder-count="3">
+<button type="button" role="radio" aria-checked="{{p.active}}" onClick="{{p.pick}}" style="{{p.style}}">{{p.label}}</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.05em">So sieht die Erfassung aus</span>
+<div style="background: #11223A; border: 1px dashed #2B4D72; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; gap: 8px; font-size: 11px; font-weight: 700; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.04em">
+<span style="width: 30px">Satz</span>
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="2">
+<span style="flex: 1; text-align: center">{{c.label}}</span>
+</sc-for>
+<span style="width: 40px; text-align: center">Ok</span>
+</div>
+<div style="display: flex; gap: 8px; align-items: center">
+<span style="width: 30px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 18px; color: #A8D5F7">1</span>
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="2">
+<span style="flex: 1; height: 40px; border: 1px solid #2B4D72; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px">{{c.val}}</span>
+</sc-for>
+<span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid #2B4D72"></span>
+</div>
+</div>
+</section>
+
+<button type="button" style="height: 54px; flex: none; border-radius: 16px; border: 0; background: #C8F24A; color: #0F2A47; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 22px; text-transform: uppercase; cursor: pointer">Übung speichern</button>
+
+</main>
+
+<nav aria-label="Hauptnavigation" style="display: flex; justify-content: space-around; padding: 8px 4px 24px; background: #0D1C31; border-top: 1px solid #22405F">
+<a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg>
+Übersicht
+</a>
+<a href="Training.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>
+Training
+</a>
+<a href="Zyklus.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>
+Zyklen
+</a>
+<a href="Fortschritt.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5h16M5 15l4-4 3 3 6.5-7"></path></svg>
+Fortschritt
+</a>
+<a href="Uebung.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 700; color: #A8D5F7">
+<span aria-hidden="true" style="width: 22px; height: 3px; border-radius: 2px; background: #C8F24A"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6.5h11M9 12h11M9 17.5h7M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"></path></svg>
+Übungen
+</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var TYPES = [
+  { id: 'wr', name: 'Gewicht × Wdh', sub: 'Langhantel, Kurzhantel, Maschine', cols: [{ label: 'kg', val: '60' }, { label: 'Wdh', val: '8' }], weight: true },
+  { id: 'bw', name: 'Zusatzlast + Wdh', sub: 'Klimmzug, Dips mit Gurt', cols: [{ label: '+ kg', val: '10' }, { label: 'Wdh', val: '6' }], weight: true },
+  { id: 'hold', name: 'Haltezeit', sub: 'Handstand, L-Sit, Plank', cols: [{ label: 'Sek.', val: '30' }], weight: false },
+  { id: 'reps', name: 'Wdh ohne Last', sub: 'Push-ups, Pistols', cols: [{ label: 'Wdh', val: '12' }], weight: false }
+];
+var CATS = ['Beine', 'Drücken', 'Ziehen', 'Rumpf', 'Skill', 'Conditioning'];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { name: 'Bulgarian Split Squat', type: 'wr', cat: 'Beine', orm: true, side: true, step: 2 };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var cur = TYPES.filter(function (t) { return t.id === st.type; })[0];
+    var types = TYPES.map(function (t) {
+      var on = st.type === t.id;
+      return {
+        name: t.name, sub: t.sub, active: on,
+        pick: function () { self.setState({ type: t.id }); },
+        style: 'min-height: 76px; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; text-align: left; font: inherit; cursor: pointer;' + (on ? ' background: #A8D5F7; color: #0F2A47; border: 0;' : ' background: #11223A; color: #EEF5FC; border: 1px solid #22405F;'),
+        subStyle: 'font-size: 12px; line-height: 1.3; color: ' + (on ? '#1E4468' : '#9FB6CC') + ';'
+      };
+    });
+    var cats = CATS.map(function (c) {
+      var on = st.cat === c;
+      return { name: c, active: on, pick: function () { self.setState({ cat: c }); }, style: 'min-height: 40px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;' + (on ? ' background: #EEF5FC; color: #0F2A47; border: 0;' : ' background: transparent; color: #EEF5FC; border: 1.5px solid #2B4D72;') };
+    });
+    function sw(id, name, sub, key, first) {
+      var on = !!st[key];
+      return {
+        id: id, name: name, sub: sub, on: on,
+        toggle: function () { var p = {}; p[key] = !self.state[key]; self.setState(p); },
+        rowStyle: 'display: flex; align-items: center; gap: 12px; min-height: 64px;' + (first ? '' : ' border-top: 1px solid #22405F;'),
+        trackStyle: 'width: 52px; height: 32px; flex: none; border-radius: 16px; border: 0; padding: 3px; display: flex; cursor: pointer; justify-content: ' + (on ? 'flex-end' : 'flex-start') + '; background: ' + (on ? '#C8F24A' : '#2B4D72') + ';',
+        knobStyle: 'width: 26px; height: 26px; border-radius: 13px; background: ' + (on ? '#0F2A47' : '#EEF5FC') + ';'
+      };
+    }
+    var switches = [];
+    if (cur.weight) switches.push(sw('sw-orm', '1RM berechnen', 'Erscheint im Fortschritt und im Zyklus als %', 'orm', true));
+    switches.push(sw('sw-side', 'Einseitig', 'Werte gelten pro Seite', 'side', switches.length === 0));
+    var steps = [{ v: 0, label: '1' }, { v: 1, label: '1.25' }, { v: 2, label: '2.5' }].map(function (p) {
+      var on = st.step === p.v;
+      return { label: p.label, active: on, pick: function () { self.setState({ step: p.v }); }, style: 'min-width: 48px; min-height: 38px; padding: 0 8px; border: 0; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;' + (on ? ' background: #A8D5F7; color: #0F2A47;' : ' background: transparent; color: #9FB6CC;') };
+    });
+    return {
+      name: st.name,
+      onName: function (ev) { self.setState({ name: ev.target.value }); },
+      types: types,
+      cats: cats,
+      switches: switches,
+      hasStep: !!cur.weight,
+      steps: steps,
+      cols: cur.cols
+    };
+  }
+}
+</script>
+</body>
+</html>

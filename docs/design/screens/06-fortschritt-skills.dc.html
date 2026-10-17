@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<title>Skill Handstand</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,700;1,800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A8D5F7}a:hover{color:#D4EBFC}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0A1628; font-family: 'Barlow', sans-serif; color: #EEF5FC; overflow: hidden">
+<main style="flex: 1; overflow-y: auto; padding: 26px 18px 22px; display: flex; flex-direction: column; gap: 14px">
+
+<header style="display: flex; justify-content: space-between; align-items: center">
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 40px; line-height: 1; text-transform: uppercase">Fortschritt</h1>
+<nav aria-label="Bereich" style="display: flex; background: #11223A; border: 1px solid #22405F; border-radius: 12px; padding: 3px">
+<a href="Fortschritt.dc.html" style="min-height: 38px; padding: 0 14px; border-radius: 10px; color: #9FB6CC; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center">Lifts</a>
+<a href="Skills.dc.html" aria-current="page" style="min-height: 38px; padding: 0 14px; border-radius: 10px; background: #A8D5F7; color: #0F2A47; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center">Skills</a>
+</nav>
+</header>
+
+<div role="group" aria-label="Skill wählen" style="display: flex; gap: 8px; overflow-x: auto">
+<sc-for list="{{skills}}" as="k" hint-placeholder-count="4">
+<button type="button" aria-pressed="{{k.active}}" onClick="{{k.pick}}" style="{{k.style}}">{{k.name}}</button>
+</sc-for>
+</div>
+
+<section style="background: #A8D5F7; color: #0F2A47; border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em">{{hero.stage}}</span>
+<span style="background: #0F2A47; color: #C8F24A; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 15px; padding: 3px 10px; transform: skewX(-12deg); border-radius: 4px">{{hero.badge}}</span>
+</div>
+<h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 28px; line-height: 1; text-transform: uppercase">{{hero.title}}</h2>
+<div style="display: flex; align-items: baseline; gap: 8px">
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 60px; line-height: 0.9">{{hero.best}}</span>
+<span style="font-size: 15px; font-weight: 600">{{hero.goal}}</span>
+</div>
+<div aria-hidden="true" style="height: 10px; border-radius: 5px; background: #7FB4DE; overflow: hidden"><div style="{{hero.barStyle}}"></div></div>
+</section>
+
+<section style="background: #11223A; border: 1px solid #22405F; border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-size: 12px; font-weight: 700; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.05em">{{chartTitle}}</span>
+<span style="font-size: 12px; font-weight: 700; color: #C8F24A">{{chartDelta}}</span>
+</div>
+<div role="img" aria-label="{{chartLabel}}" style="display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; align-items: end; height: 120px">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="10">
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 120px">
+<span aria-hidden="true" style="font-size: 11px; font-weight: 700; color: {{b.labelColor}}">{{b.v}}</span>
+<span aria-hidden="true" style="{{b.style}}"></span>
+</div>
+</sc-for>
+</div>
+<div aria-hidden="true" style="display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="10">
+<span style="font-size: 10px; text-align: center; color: #9FB6CC">{{b.wk}}</span>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 22px; text-transform: uppercase">Stufen</h2>
+<span style="font-size: 12px; color: #9FB6CC">von dir festgelegt</span>
+</div>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{stages}}" as="s" hint-placeholder-count="6">
+<li style="{{s.rowStyle}}">
+<span style="{{s.numStyle}}">{{s.mark}}</span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+<span style="font-size: 15px; font-weight: 700">{{s.name}}</span>
+<span style="font-size: 12px; color: {{s.subColor}}">{{s.sub}}</span>
+</div>
+</li>
+</sc-for>
+</ol>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button type="button" style="min-height: 52px; border-radius: 16px; border: 0; background: #C8F24A; color: #0F2A47; font: inherit; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; padding: 0 8px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.9 4.6 4.6 1.9-4.6 1.9-1.9 4.6-1.9-4.6-4.6-1.9 4.6-1.9z"></path></svg>
+KI-Stufen vorschlagen
+</button>
+<button type="button" style="min-height: 52px; border-radius: 16px; border: 1px solid #2B4D72; background: transparent; color: #EEF5FC; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">Stufen bearbeiten</button>
+</div>
+
+</main>
+
+<nav aria-label="Hauptnavigation" style="display: flex; justify-content: space-around; padding: 8px 4px 24px; background: #0D1C31; border-top: 1px solid #22405F">
+<a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg>
+Übersicht
+</a>
+<a href="Training.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>
+Training
+</a>
+<a href="Zyklus.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>
+Zyklen
+</a>
+<a href="Fortschritt.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 700; color: #A8D5F7">
+<span aria-hidden="true" style="width: 22px; height: 3px; border-radius: 2px; background: #C8F24A"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5h16M5 15l4-4 3 3 6.5-7"></path></svg>
+Fortschritt
+</a>
+<a href="Uebung.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6.5h11M9 12h11M9 17.5h7M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"></path></svg>
+Übungen
+</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var SKILLS = {
+  hs: {
+    name: 'Handstand', stage: 'Stufe 4 von 6', badge: 'AKTUELL', title: 'Freistehend halten', best: '18 s', goal: 'Bestwert · Ziel 30 s', pct: 60,
+    unit: 's', chartTitle: 'Beste Haltezeit pro Woche', delta: '+14 s in 10 Wochen',
+    v: [4, 6, 7, 9, 10, 11, 13, 14, 16, 18],
+    stages: [
+      { name: 'Wand-Handstand, Bauch zur Wand', sub: 'Ziel 60 s · erreicht im Juli', st: 'done' },
+      { name: 'Schulter-Taps an der Wand', sub: 'Ziel 2 × 10 · erreicht im August', st: 'done' },
+      { name: 'Kick-up in den Handstand', sub: 'Ziel 8 von 10 Versuchen · erreicht im September', st: 'done' },
+      { name: 'Freistehend halten', sub: 'Ziel 30 s · Bestwert 18 s', st: 'cur' },
+      { name: 'Freistehend halten', sub: 'Ziel 60 s', st: 'lock' },
+      { name: 'Handstand-Walk', sub: 'Ziel 5 m', st: 'lock' }
+    ]
+  },
+  ls: {
+    name: 'L-Sit', stage: 'Stufe 2 von 4', badge: 'AKTUELL', title: 'L-Sit am Boden', best: '9 s', goal: 'Bestwert · Ziel 20 s', pct: 45,
+    unit: 's', chartTitle: 'Beste Haltezeit pro Woche', delta: '+6 s in 10 Wochen',
+    v: [3, 3, 4, 5, 5, 6, 7, 7, 8, 9],
+    stages: [
+      { name: 'Tuck-Sit an Parallettes', sub: 'Ziel 30 s · erreicht im August', st: 'done' },
+      { name: 'L-Sit am Boden', sub: 'Ziel 20 s · Bestwert 9 s', st: 'cur' },
+      { name: 'L-Sit 30 s', sub: 'Ziel 30 s', st: 'lock' },
+      { name: 'V-Sit Ansatz', sub: 'Ziel 5 s', st: 'lock' }
+    ]
+  },
+  mu: {
+    name: 'Muscle-up', stage: 'Stufe 1 von 5', badge: 'AKTUELL', title: 'Explosive Klimmzüge', best: '3', goal: 'Wdh. Brust an Stange · Ziel 5', pct: 60,
+    unit: '', chartTitle: 'Beste Wdh. pro Woche', delta: '+2 in 10 Wochen',
+    v: [1, 1, 1, 2, 2, 2, 2, 3, 3, 3],
+    stages: [
+      { name: 'Klimmzug Brust an Stange', sub: 'Ziel 5 Wdh. · Bestwert 3', st: 'cur' },
+      { name: 'Übergang am Boden', sub: 'Ziel 3 × 5', st: 'lock' },
+      { name: 'Negative Muscle-ups', sub: 'Ziel 3 × 3', st: 'lock' },
+      { name: 'Band-Muscle-up', sub: 'Ziel 3 Wdh.', st: 'lock' },
+      { name: 'Muscle-up', sub: 'Ziel 1 Wdh.', st: 'lock' }
+    ]
+  }
+};
+var ORDER = ['hs', 'ls', 'mu'];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { skill: 'hs' };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var sk = SKILLS[st.skill];
+    var chipBase = 'flex: none; min-height: 44px; padding: 0 16px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;';
+    var skills = ORDER.map(function (id) {
+      var on = st.skill === id;
+      return { name: SKILLS[id].name, active: on, pick: function () { self.setState({ skill: id }); }, style: chipBase + (on ? ' background: #EEF5FC; color: #0F2A47; border: 0;' : ' background: transparent; color: #EEF5FC; border: 1.5px solid #2B4D72;') };
+    });
+    skills.push({ name: '+ Neuer Skill', active: false, pick: function () {}, style: chipBase + ' background: transparent; color: #A8D5F7; border: 1.5px dashed #2B4D72;' });
+    var max = Math.max.apply(null, sk.v);
+    var bars = sk.v.map(function (v, i) {
+      var last = i === sk.v.length - 1;
+      return {
+        v: v, wk: 'KW' + (33 + i),
+        labelColor: last ? '#C8F24A' : '#9FB6CC',
+        style: 'width: 100%; border-radius: 6px 6px 3px 3px; height: ' + Math.max(6, Math.round(v / max * 92)) + 'px; background: ' + (last ? '#C8F24A' : '#A8D5F7') + '; opacity: ' + (last ? 1 : 0.55 + 0.45 * i / sk.v.length).toFixed(2) + ';'
+      };
+    });
+    var n = 0;
+    var stages = sk.stages.map(function (s) {
+      n += 1;
+      var done = s.st === 'done', cur = s.st === 'cur';
+      return {
+        name: s.name, sub: s.sub,
+        mark: done ? '✓' : String(n),
+        subColor: cur ? '#C8F24A' : '#9FB6CC',
+        rowStyle: 'display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px;' + (cur ? ' background: #183050; border: 1.5px solid #C8F24A;' : (done ? ' background: #11223A; border: 1px solid #22405F;' : ' background: transparent; border: 1px dashed #22405F; opacity: 0.75;')),
+        numStyle: 'width: 32px; height: 32px; flex: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-style: italic; font-weight: 800; font-size: 18px;' + (done ? ' background: #A8D5F7; color: #0F2A47;' : (cur ? ' background: #C8F24A; color: #0F2A47;' : ' background: #11223A; color: #9FB6CC;'))
+      };
+    });
+    return {
+      skills: skills,
+      hero: { stage: sk.name + ' · ' + sk.stage, badge: sk.badge, title: sk.title, best: sk.best, goal: sk.goal, barStyle: 'width: ' + sk.pct + '%; height: 10px; border-radius: 5px; background: #0F2A47;' },
+      chartTitle: sk.chartTitle,
+      chartDelta: sk.delta,
+      chartLabel: sk.chartTitle + ', Kalenderwochen 33 bis 42: ' + sk.v.join(', ') + (sk.unit ? ' Sekunden' : ' Wiederholungen'),
+      bars: bars,
+      stages: stages
+    };
+  }
+}
+</script>
+</body>
+</html>

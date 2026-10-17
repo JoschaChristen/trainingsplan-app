@@ -1,0 +1,640 @@
+{
+  "format": "trainingsplan-legacy-export",
+  "version": 1,
+  "exportedAt": "2026-10-17T09:30:00.000Z",
+  "_comment": "SYNTHETIC test fixture, not real user data",
+  "source": {
+    "app": "trainingsplan-app (GitHub Pages)",
+    "dbName": "TrainingsPlan",
+    "dbVersion": 3
+  },
+  "currentWeek": 3,
+  "plan": {
+    "name": "8-Wochen Kraftzyklus – Freitag Open Gym",
+    "startDate": null,
+    "weeks": [
+      {
+        "id": 1,
+        "label": "Woche 1",
+        "exercises": [
+          {
+            "id": "sq1",
+            "name": "Kniebeuge",
+            "sets": 5,
+            "reps": 5,
+            "weight": 68,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "bp1",
+            "name": "Bankdrücken",
+            "sets": 5,
+            "reps": 5,
+            "weight": 63,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "pu1",
+            "name": "Weighted Strict Pull-up",
+            "sets": 4,
+            "reps": 3,
+            "weight": 6,
+            "unit": "kg",
+            "desc": "+5-7kg"
+          },
+          {
+            "id": "mu1",
+            "name": "Ring-MU Negative",
+            "sets": 3,
+            "reps": 3,
+            "desc": "2-3 pro Satz"
+          },
+          {
+            "id": "sp1",
+            "name": "Strict Press",
+            "sets": 3,
+            "reps": 5,
+            "weight": 39,
+            "unit": "kg",
+            "desc": "Top Set 5 @ RPE8 (~38-40kg) + 2 Backoffs @ 90%",
+            "isTopSet": true
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "label": "Woche 2",
+        "exercises": [
+          {
+            "id": "sq2",
+            "name": "Kniebeuge",
+            "sets": 5,
+            "reps": 5,
+            "weight": 70,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "bp2",
+            "name": "Bankdrücken",
+            "sets": 5,
+            "reps": 5,
+            "weight": 63.5,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "pu2",
+            "name": "Weighted Pull-up",
+            "sets": 4,
+            "reps": 3,
+            "weight": 8.5,
+            "unit": "kg",
+            "desc": "+7-10kg"
+          },
+          {
+            "id": "mu2",
+            "name": "Ring-MU Negative",
+            "sets": 3,
+            "reps": 3
+          },
+          {
+            "id": "sp2",
+            "name": "Strict Press",
+            "sets": 3,
+            "reps": 5,
+            "weight": 39,
+            "unit": "kg",
+            "desc": "Top Set @ RPE8 + 2 Backoffs",
+            "isTopSet": true
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "label": "Woche 3",
+        "exercises": [
+          {
+            "id": "sq3",
+            "name": "Kniebeuge",
+            "sets": 5,
+            "reps": 4,
+            "weight": 73,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "bp3",
+            "name": "Bankdrücken",
+            "sets": 5,
+            "reps": 4,
+            "weight": 64.5,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "pu3",
+            "name": "Explosive Pull-up (max Speed)",
+            "sets": 5,
+            "reps": 3,
+            "weight": 0,
+            "unit": "kg",
+            "desc": "zur Brust"
+          },
+          {
+            "id": "mu3",
+            "name": "Banded MU-Transition",
+            "sets": 4,
+            "reps": 3
+          },
+          {
+            "id": "sp3",
+            "name": "Strict Press",
+            "sets": 3,
+            "reps": 4,
+            "weight": 40,
+            "unit": "kg",
+            "desc": "Top Set @ RPE8 + 2 Backoffs",
+            "isTopSet": true
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "label": "Woche 4",
+        "exercises": [
+          {
+            "id": "sq4",
+            "name": "Kniebeuge",
+            "sets": 5,
+            "reps": 4,
+            "weight": 75,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "bp4",
+            "name": "Bankdrücken",
+            "sets": 5,
+            "reps": 4,
+            "weight": 65,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "pu4",
+            "name": "Explosive Pull-up",
+            "sets": 5,
+            "reps": 3,
+            "weight": 2,
+            "unit": "kg",
+            "desc": "leicht Zusatzgewicht"
+          },
+          {
+            "id": "mu4",
+            "name": "Banded MU-Transition",
+            "sets": 4,
+            "reps": 3
+          },
+          {
+            "id": "sp4",
+            "name": "Strict Press",
+            "sets": 3,
+            "reps": 4,
+            "weight": 41,
+            "unit": "kg",
+            "desc": "Top Set @ RPE8 + 2 Backoffs",
+            "isTopSet": true
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "label": "Woche 5",
+        "exercises": [
+          {
+            "id": "sq5",
+            "name": "Kniebeuge",
+            "sets": 5,
+            "reps": 3,
+            "weight": 78,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "bp5",
+            "name": "Bankdrücken",
+            "sets": 5,
+            "reps": 3,
+            "weight": 66,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "pu5",
+            "name": "Explosive Weighted Pull-up",
+            "sets": 5,
+            "reps": 3,
+            "weight": 4,
+            "unit": "kg"
+          },
+          {
+            "id": "mu5",
+            "name": "False-Grip Hold/Transition",
+            "sets": 4,
+            "desc": "reps"
+          },
+          {
+            "id": "sp5",
+            "name": "Strict Press",
+            "sets": 3,
+            "reps": 3,
+            "weight": 42,
+            "unit": "kg",
+            "desc": "Top Set @ RPE8 + 2 Backoffs",
+            "isTopSet": true
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "label": "Woche 6 (Deload)",
+        "isDeload": true,
+        "exercises": [
+          {
+            "id": "sq6",
+            "name": "Kniebeuge",
+            "sets": 3,
+            "reps": 5,
+            "weight": 57,
+            "unit": "kg",
+            "rest": "2 Min"
+          },
+          {
+            "id": "bp6",
+            "name": "Bankdrücken",
+            "sets": 3,
+            "reps": 5,
+            "weight": 50,
+            "unit": "kg",
+            "rest": "2 Min"
+          },
+          {
+            "id": "pu6",
+            "name": "Strict Pull-up",
+            "sets": 3,
+            "reps": 5,
+            "weight": 0,
+            "unit": "kg",
+            "desc": "BW, kein MU-Drill"
+          },
+          {
+            "id": "sp6",
+            "name": "Strict Press",
+            "sets": 3,
+            "reps": 5,
+            "weight": 29,
+            "unit": "kg",
+            "desc": "~70% von W5 Top-Set, kein Test"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "label": "Woche 7",
+        "exercises": [
+          {
+            "id": "sq7",
+            "name": "Kniebeuge",
+            "sets": 5,
+            "reps": 3,
+            "weight": 80,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "bp7",
+            "name": "Bankdrücken",
+            "sets": 5,
+            "reps": 3,
+            "weight": 66.5,
+            "unit": "kg",
+            "rest": "3 Min"
+          },
+          {
+            "id": "pu7",
+            "name": "Muscle-up-Versuche",
+            "sets": 6,
+            "reps": 1,
+            "weight": 0,
+            "unit": "kg",
+            "desc": "5-8x, kipping oder strict"
+          },
+          {
+            "id": "pu7b",
+            "name": "Backup Explosive Pull-up",
+            "sets": 3,
+            "reps": 3,
+            "weight": 0,
+            "unit": "kg"
+          },
+          {
+            "id": "sp7",
+            "name": "Strict Press",
+            "sets": 3,
+            "reps": 3,
+            "weight": 43,
+            "unit": "kg",
+            "desc": "Top Set @ RPE8 + 2 Backoffs",
+            "isTopSet": true
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "label": "Woche 8 (Test)",
+        "isTest": true,
+        "exercises": [
+          {
+            "id": "sq8",
+            "name": "Kniebeuge – 5RM Test",
+            "sets": 1,
+            "reps": 5,
+            "weight": 84,
+            "unit": "kg",
+            "desc": "Ziel 83-85kg",
+            "rest": "3+ Min"
+          },
+          {
+            "id": "bp8",
+            "name": "Bankdrücken – 5RM Test",
+            "sets": 1,
+            "reps": 5,
+            "weight": 67,
+            "unit": "kg",
+            "desc": "Ziel 66-68kg",
+            "rest": "3+ Min"
+          },
+          {
+            "id": "pu8",
+            "name": "Muscle-up Test",
+            "sets": 1,
+            "desc": "max. saubere Versuche"
+          },
+          {
+            "id": "sp8",
+            "name": "Strict Press – 5RM Test",
+            "sets": 1,
+            "reps": 5,
+            "weight": 44,
+            "unit": "kg",
+            "desc": "neuer Top-Set Test"
+          }
+        ]
+      }
+    ]
+  },
+  "setLogs": [
+    {
+      "id": "1_sq1",
+      "week": 1,
+      "exerciseId": "sq1",
+      "sets": [
+        {
+          "weight": 68,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 68,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 68,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 68,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 68,
+          "reps": 4,
+          "done": true
+        }
+      ],
+      "status": "planned",
+      "substituteName": null,
+      "note": null,
+      "updatedAt": 1786123800000
+    },
+    {
+      "id": "1_bp1",
+      "week": 1,
+      "exerciseId": "bp1",
+      "sets": [
+        {
+          "weight": 63,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 63,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 63,
+          "reps": 5,
+          "done": true
+        }
+      ],
+      "status": "planned",
+      "substituteName": null,
+      "note": null,
+      "updatedAt": 1786123860000
+    },
+    {
+      "id": "1_pu1",
+      "week": 1,
+      "exerciseId": "pu1",
+      "sets": [
+        {
+          "weight": 6,
+          "reps": 3,
+          "done": true
+        },
+        {
+          "weight": 6,
+          "reps": 3,
+          "done": true
+        },
+        {
+          "weight": 6,
+          "reps": 3,
+          "done": true
+        },
+        {
+          "weight": 6,
+          "reps": 3,
+          "done": false
+        }
+      ],
+      "status": "planned",
+      "substituteName": null,
+      "note": null,
+      "updatedAt": 1786123920000
+    },
+    {
+      "id": "1_mu1",
+      "week": 1,
+      "exerciseId": "mu1",
+      "sets": [
+        {
+          "weight": null,
+          "reps": 3,
+          "done": true
+        },
+        {
+          "weight": null,
+          "reps": 2,
+          "done": true
+        }
+      ],
+      "status": "planned",
+      "substituteName": null,
+      "note": null,
+      "updatedAt": 1786123980000
+    },
+    {
+      "id": "1_sp1",
+      "week": 1,
+      "exerciseId": "sp1",
+      "sets": [
+        {
+          "weight": 40,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 36,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 36,
+          "reps": 5,
+          "done": true
+        }
+      ],
+      "status": "planned",
+      "substituteName": null,
+      "note": null,
+      "updatedAt": 1786124040000
+    },
+    {
+      "id": "2_sq2",
+      "week": 2,
+      "exerciseId": "sq2",
+      "sets": [
+        {
+          "weight": 70,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 70,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": 70,
+          "reps": 5,
+          "done": true
+        }
+      ],
+      "status": "planned",
+      "substituteName": null,
+      "note": null,
+      "updatedAt": 1786728900000
+    },
+    {
+      "id": "2_bp2",
+      "week": 2,
+      "exerciseId": "bp2",
+      "sets": [
+        {
+          "weight": 24,
+          "reps": 8,
+          "done": true
+        },
+        {
+          "weight": 24,
+          "reps": 8,
+          "done": true
+        }
+      ],
+      "status": "substituted",
+      "substituteName": "KH-Bankdrücken",
+      "note": "Schulter gezwickt",
+      "updatedAt": 1786728960000
+    },
+    {
+      "id": "2_mu2",
+      "week": 2,
+      "exerciseId": "mu2",
+      "sets": [],
+      "status": "skipped",
+      "substituteName": null,
+      "note": "keine Ringe frei",
+      "updatedAt": 1786729020000
+    },
+    {
+      "id": "2_sp2",
+      "week": 2,
+      "exerciseId": "sp2",
+      "sets": [
+        {
+          "weight": 39,
+          "reps": 5,
+          "done": true
+        },
+        {
+          "weight": null,
+          "reps": null,
+          "done": false
+        }
+      ],
+      "status": "planned",
+      "substituteName": null,
+      "note": null,
+      "updatedAt": 1786729080000
+    },
+    {
+      "id": "3_sq3",
+      "week": 3,
+      "exerciseId": "sq3",
+      "sets": [
+        {
+          "weight": 73,
+          "reps": 4,
+          "done": true
+        },
+        {
+          "weight": 73,
+          "reps": 4,
+          "done": true
+        }
+      ],
+      "status": "planned",
+      "substituteName": null,
+      "note": null,
+      "updatedAt": 1787333940000
+    }
+  ]
+}

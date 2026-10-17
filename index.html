@@ -203,6 +203,9 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
   </div>
 </nav>
 
+<button class="reset-btn" id="exportBtn" onclick="exportData()" title="Daten exportieren" aria-label="Daten exportieren" style="bottom:132px;color:var(--primary);border-color:var(--primary)">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>
+</button>
 <button class="reset-btn" id="resetBtn" onclick="resetData()" title="Daten zurücksetzen">↺</button>
 
 <script src="data.js"></script>
@@ -737,6 +740,82 @@ async function resetData() {
   trainingInitialized = false;
   render();
   showToast('Daten zurückgesetzt');
+}
+
+// ========== Export (migration to the new app) ==========
+// Exports everything the old app knows: all setLogs, the current week and the
+// full PLAN from data.js (setLogs only reference exerciseIds like "sq3").
+async function buildExport() {
+  const logs = await loadAllSetLogs();
+  return {
+    format: 'trainingsplan-legacy-export',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    source: { app: 'trainingsplan-app (GitHub Pages)', dbName: DB_NAME, dbVersion: DB_VER },
+    currentWeek: parseInt(localStorage.getItem('tp_current_week')) || 1,
+    plan: PLAN,
+    setLogs: logs
+  };
+}
+
+async function exportData() {
+  let payload;
+  try {
+    payload = await buildExport();
+  } catch (err) {
+    alert('Export fehlgeschlagen: ' + err);
+    return;
+  }
+  const json = JSON.stringify(payload, null, 2);
+  const stamp = new Date().toISOString().slice(0, 10);
+  const filename = `trainingsplan-export-${stamp}.json`;
+  const count = payload.setLogs.length;
+
+  // 1) Share sheet (iOS/Android): lets you save to Files, iCloud, mail it, etc.
+  try {
+    const file = new File([json], filename, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'Trainingsplan Export' });
+      showToast(`${count} Einträge exportiert`);
+      return;
+    }
+  } catch (err) {
+    if (err && err.name === 'AbortError') return; // user closed the share sheet
+  }
+
+  // 2) Download fallback
+  try {
+    const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  } catch (err) { /* fall through to the text fallback */ }
+
+  // 3) Always also show the raw JSON so it can be copied by hand if needed
+  document.getElementById('modalTitle').textContent = `Export: ${count} Einträge`;
+  const content = document.getElementById('modalContent');
+  content.innerHTML = '';
+  const hint = document.createElement('p');
+  hint.style.cssText = 'font-size:13px;color:var(--text-secondary);margin-bottom:8px';
+  hint.textContent = 'Falls kein Download startet: Text kopieren und als .json-Datei sichern.';
+  const ta = document.createElement('textarea');
+  ta.readOnly = true;
+  ta.value = json;
+  ta.style.cssText = 'width:100%;height:240px;font-family:monospace;font-size:11px;border:1px solid var(--border);border-radius:8px;padding:8px';
+  const btn = document.createElement('button');
+  btn.className = 'lift-btn primary';
+  btn.style.marginTop = '10px';
+  btn.textContent = 'Text kopieren';
+  btn.onclick = async () => {
+    try { await navigator.clipboard.writeText(json); showToast('Kopiert'); }
+    catch (e) { ta.select(); document.execCommand('copy'); showToast('Kopiert'); }
+  };
+  content.append(hint, ta, btn);
+  document.getElementById('modalOverlay').classList.add('open');
 }
 
 // ========== Toast ==========
