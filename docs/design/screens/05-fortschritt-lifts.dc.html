@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<title>Fortschritt Lifts</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,700;1,800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A8D5F7}a:hover{color:#D4EBFC}
+input::placeholder{color:#7F98B2}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0A1628; font-family: 'Barlow', sans-serif; color: #EEF5FC; overflow: hidden">
+<main style="flex: 1; overflow-y: auto; padding: 26px 18px 22px; display: flex; flex-direction: column; gap: 14px">
+
+<header style="display: flex; justify-content: space-between; align-items: center">
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 40px; line-height: 1; text-transform: uppercase">Fortschritt</h1>
+<nav aria-label="Bereich" style="display: flex; background: #11223A; border: 1px solid #22405F; border-radius: 12px; padding: 3px">
+<a href="Fortschritt.dc.html" aria-current="page" style="min-height: 38px; padding: 0 14px; border-radius: 10px; background: #A8D5F7; color: #0F2A47; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center">Lifts</a>
+<a href="Skills.dc.html" style="min-height: 38px; padding: 0 14px; border-radius: 10px; color: #9FB6CC; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center">Skills</a>
+</nav>
+</header>
+
+<form onSubmit="{{ask}}" style="display: flex; gap: 8px; align-items: center; background: #11223A; border: 1.5px solid #2B4D72; border-radius: 16px; padding: 4px 4px 4px 14px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8D5F7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.9 4.6 4.6 1.9-4.6 1.9-1.9 4.6-1.9-4.6-4.6-1.9 4.6-1.9z"></path></svg>
+<label for="frage" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Frage an deine Trainingsdaten</label>
+<input id="frage" type="text" placeholder="Frag deine Daten …" value="{{q}}" onChange="{{onQ}}" style="flex: 1; min-width: 0; height: 44px; border: 0; background: transparent; color: #EEF5FC; font: inherit; font-size: 15px; outline-offset: 2px">
+<button type="submit" aria-label="Frage senden" style="width: 44px; height: 44px; flex: none; border-radius: 12px; border: 0; background: #C8F24A; color: #0F2A47; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</button>
+</form>
+
+<sc-if value="{{showAnswer}}" hint-placeholder-val="{{true}}">
+<section style="background: #0E1F35; border: 1px solid #22405F; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 700; color: #A8D5F7">{{asked}}</span>
+<p style="margin: 0; font-size: 14px; line-height: 1.45; color: #DCE7F2">Dein geschätztes 1RM stieg von 116 kg im März auf 128 kg, also +12 kg in 7 Monaten oder rund 1.7 kg pro Monat. Zuletzt getestet hast du im Juni: 120 kg.</p>
+</section>
+</sc-if>
+
+<div role="group" aria-label="Lifts im Diagramm" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{chips}}" as="c" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{c.active}}" onClick="{{c.toggle}}" style="{{c.style}}">
+<span aria-hidden="true" style="{{c.dot}}"></span>
+{{c.name}}
+</button>
+</sc-for>
+</div>
+
+<section style="background: #11223A; border: 1px solid #22405F; border-radius: 22px; padding: 14px 12px 10px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding: 0 2px">
+<span style="font-size: 12px; font-weight: 700; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.05em">1RM in kg · 12 Monate</span>
+<span style="display: flex; gap: 10px; font-size: 12px; color: #9FB6CC">
+<span style="display: flex; align-items: center; gap: 4px"><span aria-hidden="true" style="width: 14px; height: 2.5px; background: #9FB6CC; border-radius: 2px"></span>geschätzt</span>
+<span style="display: flex; align-items: center; gap: 4px"><span aria-hidden="true" style="width: 9px; height: 9px; border: 2px solid #EEF5FC; transform: rotate(45deg); box-sizing: border-box"></span>getestet</span>
+</span>
+</div>
+<svg width="326" height="210" viewBox="0 0 326 210" fill="none" role="img" aria-label="{{chartLabel}}">
+<sc-for list="{{grid}}" as="g" hint-placeholder-count="5">
+<line x1="30" x2="322" y1="{{g.y}}" y2="{{g.y}}" stroke="#1D3755" stroke-width="1"></line>
+<text x="24" y="{{g.ty}}" text-anchor="end" fill="#9FB6CC" font-size="11" font-family="Barlow, sans-serif">{{g.label}}</text>
+</sc-for>
+<sc-for list="{{months}}" as="m" hint-placeholder-count="6">
+<text x="{{m.x}}" y="204" text-anchor="middle" fill="#9FB6CC" font-size="11" font-family="Barlow, sans-serif">{{m.label}}</text>
+</sc-for>
+<sc-for list="{{series}}" as="s" hint-placeholder-count="3">
+<path d="{{s.d}}" stroke="{{s.color}}" stroke-width="3" stroke-dasharray="{{s.dash}}" stroke-linecap="round" stroke-linejoin="round"></path>
+<rect x="{{s.tx}}" y="{{s.ty}}" width="10" height="10" fill="#0A1628" stroke="{{s.color}}" stroke-width="2.5" transform="{{s.tr}}"></rect>
+<circle cx="{{s.ex}}" cy="{{s.ey}}" r="5" fill="{{s.color}}"></circle>
+</sc-for>
+</svg>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{series}}" as="s" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; background: #11223A; border: 1px solid #22405F; border-radius: 16px; padding: 12px 14px">
+<span aria-hidden="true" style="{{s.bar}}"></span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 700; font-size: 15px">{{s.name}}</span>
+<span style="font-size: 12px; color: #9FB6CC">{{s.sub}}</span>
+</div>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 700; font-size: 26px">{{s.last}}<span style="font-size: 14px; color: #9FB6CC"> kg</span></span>
+</div>
+</sc-for>
+</section>
+
+<section style="border: 1.5px solid #A8D5F7; background: #0E1F35; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; gap: 8px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8D5F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16h5l3-3h8M4 8h16"></path></svg>
+<span style="font-size: 12px; font-weight: 700; color: #A8D5F7; text-transform: uppercase; letter-spacing: 0.06em">Plateau erkannt</span>
+</div>
+<span style="font-size: 16px; font-weight: 700">Bench Press seit Juli bei 92 kg</span>
+<span style="font-size: 13px; line-height: 1.4; color: #C9D8E6">4 Monate ohne Anstieg, dazu verpasste Wdh. und RPE über 9 in den letzten Wochen.</span>
+<button type="button" style="height: 44px; border-radius: 12px; border: 0; background: #A8D5F7; color: #0F2A47; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">KI-Analyse und Vorschläge</button>
+</section>
+
+</main>
+
+<nav aria-label="Hauptnavigation" style="display: flex; justify-content: space-around; padding: 8px 4px 24px; background: #0D1C31; border-top: 1px solid #22405F">
+<a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg>
+Übersicht
+</a>
+<a href="Training.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg>
+Training
+</a>
+<a href="Zyklus.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>
+Zyklen
+</a>
+<a href="Fortschritt.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 700; color: #A8D5F7">
+<span aria-hidden="true" style="width: 22px; height: 3px; border-radius: 2px; background: #C8F24A"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5h16M5 15l4-4 3 3 6.5-7"></path></svg>
+Fortschritt
+</a>
+<a href="Uebung.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 48px; text-decoration: none; font-size: 11px; font-weight: 600; color: #9FB6CC">
+<span aria-hidden="true" style="width: 22px; height: 3px"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6.5h11M9 12h11M9 17.5h7M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"></path></svg>
+Übungen
+</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var MONTHS = ['Nov', 'Dez', 'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt'];
+var EX = [
+  { id: 'bs', name: 'Back Squat', color: '#A8D5F7', dash: '', v: [108, 110, 112, 114, 116, 118, 120, 121, 123, 125, 127, 128], test: { i: 7, v: 120 }, sub: '+12 kg seit März · getestet 120 kg im Juni' },
+  { id: 'dl', name: 'Deadlift', color: '#C8F24A', dash: '', v: [140, 142, 143, 145, 147, 148, 150, 151, 153, 154, 156, 157], test: { i: 9, v: 155 }, sub: '+10 kg seit März · getestet 155 kg im August' },
+  { id: 'bp', name: 'Bench Press', color: '#7FA3C7', dash: '7 6', v: [84, 85, 87, 88, 89, 90, 91, 92, 92, 92, 92, 92], test: { i: 8, v: 92 }, sub: 'Plateau seit Juli · getestet 92 kg im Juli' }
+];
+var LO = 80, HI = 160, L = 34, R = 316, T = 8, B = 186;
+function px(i) { return L + i * (R - L) / 11; }
+function py(v) { return T + (HI - v) / (HI - LO) * (B - T); }
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { on: { bs: true, dl: true, bp: true }, q: 'Wie hat sich mein Squat seit März entwickelt?', asked: 'Wie hat sich mein Squat seit März entwickelt?' };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var chips = EX.map(function (e) {
+      var active = !!st.on[e.id];
+      return {
+        name: e.name, active: active,
+        toggle: function () { var o = Object.assign({}, self.state.on); o[e.id] = !o[e.id]; self.setState({ on: o }); },
+        style: 'display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;' + (active ? ' background: #183050; color: #EEF5FC; border: 1.5px solid ' + e.color + ';' : ' background: transparent; color: #9FB6CC; border: 1.5px solid #22405F;'),
+        dot: 'width: 10px; height: 10px; border-radius: 50%; box-sizing: border-box;' + (active ? ' background: ' + e.color + ';' : ' border: 2px solid #5F7C99;')
+      };
+    });
+    var grid = [];
+    for (var t = LO; t <= HI; t += 20) grid.push({ y: py(t).toFixed(1), ty: (py(t) + 4).toFixed(1), label: String(t) });
+    var months = [];
+    for (var i = 0; i < 12; i += 2) months.push({ x: px(i + 1).toFixed(1), label: MONTHS[i + 1] });
+    var series = EX.filter(function (e) { return st.on[e.id]; }).map(function (e) {
+      var d = e.v.map(function (v, i) { return (i === 0 ? 'M' : 'L') + px(i).toFixed(1) + ' ' + py(v).toFixed(1); }).join(' ');
+      var tx = px(e.test.i), ty = py(e.test.v);
+      return {
+        name: e.name, color: e.color, dash: e.dash || 'none', d: d, sub: e.sub, last: e.v[11],
+        tx: (tx - 5).toFixed(1), ty: (ty - 5).toFixed(1), tr: 'rotate(45 ' + tx.toFixed(1) + ' ' + ty.toFixed(1) + ')',
+        ex: px(11).toFixed(1), ey: py(e.v[11]).toFixed(1),
+        bar: 'width: 4px; height: 36px; border-radius: 2px; background: ' + e.color + ';'
+      };
+    });
+    return {
+      chips: chips, grid: grid, months: months, series: series,
+      chartLabel: 'Liniendiagramm 1RM über 12 Monate: ' + series.map(function (s) { return s.name + ' aktuell ' + s.last + ' kg'; }).join(', '),
+      q: st.q,
+      asked: st.asked,
+      showAnswer: !!st.asked,
+      onQ: function (ev) { self.setState({ q: ev.target.value }); },
+      ask: function (ev) { if (ev && ev.preventDefault) ev.preventDefault(); self.setState({ asked: self.state.q }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

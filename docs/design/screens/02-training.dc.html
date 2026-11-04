@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<title>Training erfassen</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,700;1,800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A8D5F7}a:hover{color:#D4EBFC}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0A1628; font-family: 'Barlow', sans-serif; color: #EEF5FC; overflow: hidden">
+
+<header style="padding: 24px 18px 12px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #22405F">
+<a href="Main.dc.html" aria-label="Zurück zur Übersicht" style="width: 44px; height: 44px; flex: none; border-radius: 14px; border: 1px solid #22405F; background: #11223A; color: #EEF5FC; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+</a>
+<div style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+<span style="font-size: 12px; font-weight: 600; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.05em">Woche 3 · Tag A</span>
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 26px; line-height: 1.05; text-transform: uppercase">Unterkörper</h1>
+</div>
+<div role="timer" aria-label="Pause, noch 1 Minute 45 Sekunden" style="display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px; border-radius: 12px; background: #C8F24A; color: #0F2A47; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 20px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"></circle><path d="M12 9.5V13l2.5 1.5M10 3h4"></path></svg>
+1:45
+</div>
+</header>
+
+<main style="flex: 1; overflow-y: auto; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 12px">
+
+<section style="background: #11223A; border: 1px solid #22405F; border-radius: 22px; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 0 2px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 style="margin: 0; font-size: 19px; font-weight: 700">Back Squat</h2>
+<span style="font-size: 13px; color: #9FB6CC">Plan 5 × 5 @ 80 % · 1RM 128 kg</span>
+</div>
+<button type="button" aria-label="Scheibenrechner: 25, 15 und 1.25 kg je Seite" style="min-height: 44px; padding: 0 10px; border-radius: 12px; border: 1px solid #22405F; background: #183050; color: #A8D5F7; font: inherit; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12h18M7 7v10M10 5v14M17 7v10"></path></svg>
+25·15·1.25
+</button>
+</div>
+
+<div style="display: grid; grid-template-columns: 30px minmax(0, 1fr) 64px 50px 44px 44px; gap: 6px; align-items: center; padding: 0 2px; font-size: 11px; font-weight: 700; color: #9FB6CC; text-transform: uppercase; letter-spacing: 0.04em">
+<span>Satz</span><span>Vorher</span><span style="text-align: center">kg</span><span style="text-align: center">Wdh</span><span style="text-align: center">Ok</span><span></span>
+</div>
+
+<sc-for list="{{rows}}" as="s" hint-placeholder-count="6">
+<div style="{{s.rowStyle}}">
+<span style="{{s.numStyle}}">{{s.label}}</span>
+<span style="font-size: 13px; color: #9FB6CC; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{s.prev}}</span>
+<input type="number" inputmode="decimal" step="2.5" aria-label="{{s.kgLabel}}" value="{{s.kg}}" onChange="{{s.onKg}}" style="width: 100%; height: 40px; box-sizing: border-box; border: 1px solid #2B4D72; border-radius: 10px; background: #0A1628; color: #EEF5FC; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700">
+<input type="number" inputmode="numeric" step="1" aria-label="{{s.rLabel}}" value="{{s.r}}" onChange="{{s.onR}}" style="width: 100%; height: 40px; box-sizing: border-box; border: 1px solid #2B4D72; border-radius: 10px; background: #0A1628; color: #EEF5FC; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700">
+<button type="button" aria-pressed="{{s.done}}" aria-label="{{s.doneLabel}}" onClick="{{s.toggle}}" style="{{s.checkStyle}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</button>
+<button type="button" aria-label="{{s.delLabel}}" onClick="{{s.remove}}" style="width: 44px; height: 44px; border-radius: 10px; border: 0; background: transparent; color: #7F98B2; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"></path></svg>
+</button>
+</div>
+</sc-for>
+
+<div style="display: flex; gap: 8px">
+<button type="button" onClick="{{addSet}}" style="flex: 1; height: 44px; border-radius: 12px; border: 1.5px dashed #2B4D72; background: transparent; color: #A8D5F7; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">+ Satz</button>
+<button type="button" onClick="{{addWarm}}" style="flex: 1; height: 44px; border-radius: 12px; border: 1.5px dashed #2B4D72; background: transparent; color: #9FB6CC; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">+ Aufwärmsatz</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 10px 2px 2px; border-top: 1px solid #22405F">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-size: 13px; font-weight: 700">Wie schwer war der letzte Satz?</span>
+<span style="font-size: 12px; color: #9FB6CC">RPE, optional</span>
+</div>
+<div role="group" aria-label="RPE letzter Satz" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{rpe}}" as="p" hint-placeholder-count="5">
+<button type="button" aria-pressed="{{p.active}}" onClick="{{p.pick}}" style="{{p.style}}">{{p.label}}</button>
+</sc-for>
+</div>
+<span style="font-size: 12px; color: #9FB6CC">{{rpeHint}}</span>
+</div>
+</section>
+
+<section style="background: #11223A; border: 1px solid #22405F; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 16px; font-weight: 700">Romanian Deadlift</span>
+<span style="font-size: 13px; color: #9FB6CC">3 × 8 · 80 kg · zuletzt 77.5 kg</span>
+</div>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 700; font-size: 18px; color: #9FB6CC">0/3</span>
+</section>
+
+<section style="background: #11223A; border: 1px solid #22405F; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-size: 16px; font-weight: 700">Handstand an der Wand</span>
+<span style="font-size: 11px; font-weight: 700; color: #0F2A47; background: #A8D5F7; padding: 2px 7px; border-radius: 6px; text-transform: uppercase">Haltezeit</span>
+</div>
+<span style="font-size: 13px; color: #9FB6CC">5 × 40 s · Skill Handstand, Stufe 4</span>
+</div>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 700; font-size: 18px; color: #9FB6CC">0/5</span>
+</section>
+
+<button type="button" style="height: 44px; border-radius: 12px; border: 1px solid #22405F; background: transparent; color: #A8D5F7; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">Übung hinzufügen oder tauschen</button>
+
+</main>
+
+<div style="padding: 12px 18px 26px; background: #0D1C31; border-top: 1px solid #22405F">
+<a href="Main.dc.html" style="display: flex; align-items: center; justify-content: center; height: 54px; border-radius: 16px; background: #C8F24A; color: #0F2A47; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: 22px; text-transform: uppercase; text-decoration: none">Einheit abschliessen</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+function fmt(x) { return (Math.round(x * 4) / 4).toString(); }
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      rpe: null,
+      sets: [
+        { warm: true, kg: 60, r: 5, done: true, prev: '60 × 5' },
+        { kg: 102.5, r: 5, done: true, prev: '100 × 5' },
+        { kg: 102.5, r: 5, done: true, prev: '100 × 5' },
+        { kg: 102.5, r: 5, done: false, prev: '100 × 5' },
+        { kg: 102.5, r: 5, done: false, prev: '100 × 5' },
+        { kg: 102.5, r: 5, done: false, prev: '100 × 4' }
+      ]
+    };
+  }
+  update(i, patch) {
+    var sets = this.state.sets.map(function (s, j) { return j === i ? Object.assign({}, s, patch) : s; });
+    this.setState({ sets: sets });
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var n = 0;
+    var rows = st.sets.map(function (s, i) {
+      if (!s.warm) n += 1;
+      var label = s.warm ? 'W' : String(n);
+      return {
+        label: label,
+        prev: s.prev || '–',
+        kg: s.kg,
+        r: s.r,
+        done: !!s.done,
+        kgLabel: 'Satz ' + label + ', Gewicht in kg',
+        rLabel: 'Satz ' + label + ', Wiederholungen',
+        doneLabel: 'Satz ' + label + (s.done ? ' erledigt' : ' als erledigt markieren'),
+        delLabel: 'Satz ' + label + ' löschen',
+        rowStyle: 'display: grid; grid-template-columns: 30px minmax(0, 1fr) 64px 50px 44px 44px; gap: 6px; align-items: center; padding: 4px 2px; border-radius: 12px;' + (s.done ? ' background: #183050;' : ''),
+        numStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-style: italic; font-weight: 800; font-size: 18px; text-align: center; color: ' + (s.warm ? '#9FB6CC' : '#A8D5F7') + ';',
+        checkStyle: 'width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;' + (s.done ? ' background: #C8F24A; color: #0F2A47; border: 0;' : ' background: transparent; color: #5F7C99; border: 1.5px solid #2B4D72;'),
+        toggle: function () { self.update(i, { done: !s.done }); },
+        remove: function () { self.setState({ sets: self.state.sets.filter(function (_, j) { return j !== i; }) }); },
+        onKg: function (ev) { var v = parseFloat(ev.target.value); self.update(i, { kg: isNaN(v) ? 0 : v }); },
+        onR: function (ev) { var v = parseInt(ev.target.value, 10); self.update(i, { r: isNaN(v) ? 0 : v }); }
+      };
+    });
+    var work = st.sets.filter(function (s) { return !s.warm; });
+    var last = work.length ? work[work.length - 1] : { kg: 102.5, r: 5 };
+    var rpe = [6, 7, 8, 9, 10].map(function (p) {
+      var active = st.rpe === p;
+      return {
+        label: String(p),
+        active: active,
+        pick: function () { self.setState({ rpe: active ? null : p }); },
+        style: 'height: 44px; border-radius: 12px; font-family: \'Barlow Condensed\', sans-serif; font-style: italic; font-weight: 800; font-size: 20px; cursor: pointer;' + (active ? ' background: #A8D5F7; color: #0F2A47; border: 0;' : ' background: transparent; color: #EEF5FC; border: 1px solid #2B4D72;')
+      };
+    });
+    var hints = { 6: 'Sehr locker, 4 oder mehr Wdh. wären noch gegangen', 7: 'Locker, etwa 3 Wdh. in Reserve', 8: 'Fordernd, etwa 2 Wdh. in Reserve', 9: 'Hart, noch 1 Wdh. möglich', 10: 'Maximal, keine Wdh. mehr möglich' };
+    return {
+      rows: rows,
+      rpe: rpe,
+      rpeHint: st.rpe ? hints[st.rpe] : 'Hilft dem Wochen-Check-in, die nächste Last vorzuschlagen.',
+      addSet: function () { self.setState({ sets: self.state.sets.concat([{ kg: last.kg, r: last.r, done: false, prev: '–' }]) }); },
+      addWarm: function () {
+        var sets = self.state.sets.slice();
+        var at = 0;
+        while (at < sets.length && sets[at].warm) at++;
+        sets.splice(at, 0, { warm: true, kg: fmt(last.kg * 0.6), r: 5, done: false, prev: '–' });
+        self.setState({ sets: sets });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
