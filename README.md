@@ -71,14 +71,19 @@ The app uses relative asset paths and hash routes, so it also works beneath a UR
 subdirectory. Upload only the contents of `dist/`, never the repository root or
 `legacy/`. Keep the final hostname stable so the phone retains access to its data.
 
-At implementation time GitHub Pages still uses **Deploy from a branch**, **main**,
-**/(root)**, at <https://joschachristen.github.io/trainingsplan-app/>. That configuration
-serves the old static app and does not build Vite. Do not merge the Vite source into
-that production setup without an agreed hosting cutover. No repository settings
-were changed. The implementation branch `feat/training-app` was pushed on
-2026-11-05; [draft PR #2](https://github.com/JoschaChristen/trainingsplan-app/pull/2)
-tracks the cutover. Cloudflare setup is waiting for the user to sign in. No
-Cloudflare project or deployment has been created yet.
+GitHub Pages remains available at <https://joschachristen.github.io/trainingsplan-app/>.
+On 2026-11-05 its source was changed from `main` to `legacy-pages`, **/(root)**,
+using **Deploy from a branch**. The `legacy-pages` branch preserves exactly commit
+`d592c5a3e0ca445eb4463d6a30a506bfa91239db`, so merging the Vite source into `main`
+will not change the old site's source. The Pages API still reports the previous
+failed deployment; source configuration is verified, a new successful deployment
+is not yet verified. Do not disable this old site until phone migration is confirmed.
+
+The implementation branch `feat/training-app` was pushed on 2026-11-05;
+[draft PR #2](https://github.com/JoschaChristen/trainingsplan-app/pull/2) tracks the
+cutover. Cloudflare sign-in is complete. Connecting GitHub is waiting for the
+user's GitHub identity reconfirmation; the repository permission scope still needs
+inspection. No Cloudflare project or deployment has been created yet.
 
 PR #1 was merged at `d592c5a3e0ca445eb4463d6a30a506bfa91239db`. Its Pages build passed,
 but the deployment timed out (`Timeout reached, aborting!`) while awaiting Pages:
