@@ -75,7 +75,10 @@ At implementation time GitHub Pages still uses **Deploy from a branch**, **main*
 **/(root)**, at <https://joschachristen.github.io/trainingsplan-app/>. That configuration
 serves the old static app and does not build Vite. Do not merge the Vite source into
 that production setup without an agreed hosting cutover. No repository settings
-were changed and the implementation branch has not been pushed.
+were changed. The implementation branch `feat/training-app` was pushed on
+2026-11-05; [draft PR #2](https://github.com/JoschaChristen/trainingsplan-app/pull/2)
+tracks the cutover. Cloudflare setup is waiting for the user to sign in. No
+Cloudflare project or deployment has been created yet.
 
 PR #1 was merged at `d592c5a3e0ca445eb4463d6a30a506bfa91239db`. Its Pages build passed,
 but the deployment timed out (`Timeout reached, aborting!`) while awaiting Pages:
