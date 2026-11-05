@@ -79,11 +79,21 @@ will not change the old site's source. The Pages API still reports the previous
 failed deployment; source configuration is verified, a new successful deployment
 is not yet verified. Do not disable this old site until phone migration is confirmed.
 
-The implementation branch `feat/training-app` was pushed on 2026-11-05;
-[draft PR #2](https://github.com/JoschaChristen/trainingsplan-app/pull/2) tracks the
-cutover. Cloudflare sign-in is complete. Connecting GitHub is waiting for the
-user's GitHub identity reconfirmation; the repository permission scope still needs
-inspection. No Cloudflare project or deployment has been created yet.
+The app is published at <https://trainingsplan-app-9gt.pages.dev/>. Keep this
+hostname stable for device-local data and OpenRouter authentication. Cloudflare
+Pages project `trainingsplan-app` is connected to this repository, with
+`npm run build`, output `dist`, and `NODE_VERSION=22`. Automatic production
+builds use `main`; other branches receive previews.
+
+The first successful deployment on 2026-11-05 built commit `ae53481` from
+`feat/training-app`, deployment `31114181-6077-4dff-9a7d-5185761dc294`.
+The live home, cycles, progress and exercise library were checked in Chrome.
+The app showed offline readiness and no captured browser warnings/errors.
+Loaded JS/CSS asset names matched the locally tested build. A separate HTTP
+client received 403, so a complete remote byte comparison was not performed.
+[PR #2](https://github.com/JoschaChristen/trainingsplan-app/pull/2) tracks the
+production cutover. Phone installation/import and real OpenRouter connection
+still require user acceptance.
 
 PR #1 was merged at `d592c5a3e0ca445eb4463d6a30a506bfa91239db`. Its Pages build passed,
 but the deployment timed out (`Timeout reached, aborting!`) while awaiting Pages:
