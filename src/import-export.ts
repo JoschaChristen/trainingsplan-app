@@ -265,10 +265,19 @@ export function convertLegacy(
       let e = original;
       if (old.status === "substituted") {
         // The old app stores "" or null until a substitute name is typed.
-        const name = old.substituteName?.trim() || "Ersatzübung ohne Namen";
+        // One placeholder per original lift, kept out of 1RM tracking so
+        // unknown substitutes never feed another lift's estimates.
+        const typed = old.substituteName?.trim(),
+          name = typed || "Ersatz für " + original.name;
         e = d.exercises.find(
           (x) => x.name === name && x.type === original.type,
-        ) ?? { ...original, id: uid(), name, aliases: [] };
+        ) ?? {
+          ...original,
+          id: uid(),
+          name,
+          aliases: [],
+          ...(typed ? {} : { trackOneRm: false }),
+        };
         if (!d.exercises.some((x) => x.id === e.id)) d.exercises.push(e);
       }
       const seId = uid();

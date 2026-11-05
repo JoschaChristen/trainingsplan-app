@@ -1,5 +1,12 @@
-import { test, expect } from "@playwright/test";
-import { importLegacyFixture, open, watchErrors } from "./helpers";
+import { test, expect, type Page } from "@playwright/test";
+import {
+  addExercise,
+  dump,
+  importLegacyFixture,
+  open,
+  startFreeSessionWith,
+  watchErrors,
+} from "./helpers";
 
 const routes = [
   "/",
@@ -65,9 +72,28 @@ for (const width of [360, 390, 430]) {
           page.getByText("Ansicht konnte nicht geladen"),
         ).toHaveCount(0);
       }
+      // Dynamic pages: an imported session and a live session with weight,
+      // hold and bodyweight-plus-load exercises (widest set-row grids).
+      const sessionId = (await dump(page)).sessions[0] as { id: string };
+      const dynamic = ["/history/" + sessionId.id];
+      for (const route of dynamic) await expectClean(page, route);
+      await startFreeSessionWith(page, "Kniebeuge");
+      await addExercise(page, "L-Sit");
+      await addExercise(page, "Klimmzug mit Zusatzgewicht");
+      await expectClean(page, null);
       expect(errors).toEqual([]);
     });
   });
+}
+
+async function expectClean(page: Page, route: string | null) {
+  if (route) await open(page, route);
+  const where = route ?? page.url();
+  const overflow = await page.evaluate(
+    () => document.scrollingElement!.scrollWidth - window.innerWidth,
+  );
+  expect(overflow, `horizontal scroll on ${where}`).toBeLessThanOrEqual(0);
+  expect(await page.evaluate(smallTargets), `targets on ${where}`).toEqual([]);
 }
 
 test("the offline-ready banner does not keep covering the header", async ({

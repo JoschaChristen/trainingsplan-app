@@ -127,15 +127,30 @@ describe("legacy import edge cases", () => {
       const d = convertLegacy(legacy);
       validateRelations(d);
       const substitute = d.exercises.find(
-        (e) => e.name === "Ersatzübung ohne Namen",
+        (e) => e.name === "Ersatz für Bankdrücken",
       );
-      expect(substitute).toBeDefined();
+      expect(substitute).toMatchObject({ trackOneRm: false });
       expect(d.sets).toHaveLength(25);
       expect(
         d.sessionExercises.find((se) => se.exerciseId === substitute!.id)
           ?.substitutedFromExerciseId,
       ).toBeDefined();
     }
+  });
+  it("keeps unnamed substitutions of different lifts apart", () => {
+    const legacy = legacySchema.parse(structuredClone(fixture));
+    for (const r of legacy.setLogs.filter((r) => r.week === 2 && r.sets.length))
+      Object.assign(r, { status: "substituted", substituteName: "" });
+    const d = convertLegacy(legacy);
+    validateRelations(d);
+    const placeholders = d.exercises.filter((e) =>
+      e.name.startsWith("Ersatz für "),
+    );
+    expect(placeholders.length).toBeGreaterThan(1);
+    expect(new Set(placeholders.map((e) => e.name)).size).toBe(
+      placeholders.length,
+    );
+    expect(placeholders.every((e) => !e.trackOneRm)).toBe(true);
   });
   it("creates no session for a week whose setLogs carry no data", () => {
     const legacy = legacySchema.parse(structuredClone(fixture));
