@@ -5,32 +5,44 @@ Vite, Dexie/IndexedDB. The original app is preserved unchanged in `legacy/` and 
 not included in the production build. No personal exports or credentials are stored
 in this repository.
 
+Live: <https://trainingsplan-app-9gt.pages.dev/>
+
 ## Run locally
 
-Use Node.js 22.12+ (or Node.js 20.19+) and npm:
+Use Node.js 22.12+ (see `.nvmrc`) and npm:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open the address printed by Vite. For the real installable/offline build:
+Open the address printed by Vite. Development mode does not install the offline
+service worker. For the real installable/offline build:
 
 ```sh
-npm test
 npm run build
 npm run preview
 ```
 
-The production output is `dist/`. Development mode does not install the offline
-service worker. All fonts and icons are bundled locally; basic training requires
-no account and makes no external network requests.
+## Checks
+
+| Command                | What it checks                                         |
+| ---------------------- | ------------------------------------------------------ |
+| `npm run typecheck`    | Strict TypeScript for the app and the e2e tests        |
+| `npm run lint`         | ESLint (TypeScript and React hooks rules)              |
+| `npm run format:check` | Prettier formatting                                    |
+| `npm test`             | Vitest unit tests (`src/**/*.test.ts`)                 |
+| `npm run test:e2e`     | Playwright against `dist/` (run `npm run build` first) |
+
+GitHub Actions (`.github/workflows/ci.yml`) runs all of them on every pull request
+and on pushes to `main`. Locally, Playwright needs a Chromium build
+(`npx playwright install chromium`).
 
 ## Features
 
 - Editable exercise library: weight/repetitions, bodyweight plus load, holds and reps.
 - Free and planned sessions: instant saves, resume after reload, previous values,
-  warm-ups, undo removed sets, RPE, notes, rest timer and plate calculator.
+  warm-ups, undo removed sets, RPE, notes, rest timer, plate calculator, swap exercise.
 - Training cycles: variable weeks/days, linear and wave templates, editable week
   matrix, percentages or kilograms, copy-forward progression and active-cycle view.
 - Deterministic Epley/Brzycki estimates, manually entered/tested maxes, charts, PRs,
@@ -51,61 +63,32 @@ no account and makes no external network requests.
 3. Open settings, select the old JSON export, check exercise mapping and dates, then
    confirm the import. A legacy file may only be imported once to avoid duplicates.
 4. Verify the history and export a new backup. Keep the original export too.
-5. Training data is local to the browser/origin and is not automatically synchronised
-   across devices. Changing the hosting URL requires importing a backup on that URL.
+5. Training data is local to the browser/origin and is not synchronised across
+   devices. Changing the hosting URL requires importing a backup on that URL
+   ("Daten zusammenführen" reuses exercises with the same name and type).
 
 Backups deliberately omit the OpenRouter key. Import preserves an existing key on
 this device, but never imports a key from a file. No automatic reset is provided.
+Real export and backup files are git-ignored; never commit them.
 
 ## Deployment
 
-The intended host in the handover is Cloudflare Pages, using only this repository:
+**Cloudflare Pages** (project `trainingsplan-app`, connected to this repository):
 
-- Repository: `JoschaChristen/trainingsplan-app`
-- Build command: `npm run build`
-- Output directory: `dist`
-- Production branch: `main`; feature branches can use preview deployments.
-- Use a supported Node version (22.12+). No secrets or server-side services are needed.
+- Build command `npm run build`, output directory `dist`, `NODE_VERSION=22`
+  (also pinned in `.nvmrc`).
+- Production branch `main`; every other branch gets a preview URL.
+- No secrets or server-side services are needed. Commits whose message starts with
+  `[CF-Pages-Skip]` do not trigger a build.
+- The app uses relative asset paths and hash routes, so no `_redirects` or
+  `404.html` is needed. Cloudflare's default `max-age=0, must-revalidate` for
+  `index.html` and `sw.js` makes updates arrive on the next start.
+- Keep the hostname stable: device data and the OpenRouter login are bound to it.
 
-The app uses relative asset paths and hash routes, so it also works beneath a URL
-subdirectory. Upload only the contents of `dist/`, never the repository root or
-`legacy/`. Keep the final hostname stable so the phone retains access to its data.
-
-GitHub Pages remains available at <https://joschachristen.github.io/trainingsplan-app/>.
-On 2026-11-05 its source was changed from `main` to `legacy-pages`, **/(root)**,
-using **Deploy from a branch**. The `legacy-pages` branch preserves exactly commit
-`d592c5a3e0ca445eb4463d6a30a506bfa91239db`, so merging the Vite source into `main`
-will not change the old site's source. The Pages API still reports the previous
-failed deployment; source configuration is verified, a new successful deployment
-is not yet verified. Do not disable this old site until phone migration is confirmed.
-
-The app is published at <https://trainingsplan-app-9gt.pages.dev/>. Keep this
-hostname stable for device-local data and OpenRouter authentication. Cloudflare
-Pages project `trainingsplan-app` is connected to this repository, with
-`npm run build`, output `dist`, and `NODE_VERSION=22`. Automatic production
-builds use `main`; other branches receive previews.
-
-The first successful deployment on 2026-11-05 built commit `ae53481` from
-`feat/training-app`, deployment `31114181-6077-4dff-9a7d-5185761dc294`.
-The live home, cycles, progress and exercise library were checked in Chrome.
-The app showed offline readiness and no captured browser warnings/errors.
-Loaded JS/CSS asset names matched the locally tested build. A separate HTTP
-client received 403, so a complete remote byte comparison was not performed.
-[PR #2](https://github.com/JoschaChristen/trainingsplan-app/pull/2) was merged
-as `5113c87` on 2026-11-05. Its production deployment
-`fcc7fd2b-6d0a-42d6-bfa5-ce13c44966cd` completed successfully, confirmed in
-Cloudflare and the GitHub Cloudflare Pages check. The main checkout is current.
-OpenRouter PKCE authorization and the data-free key connection test succeeded
-on desktop Chrome on 2026-11-05. The model `openai/gpt-4.1-mini` and enabled AI
-setting were saved and retained after reload. Its structured-output capability
-was checked against the public model catalogue. No real training data was sent
-and no model completion was requested. Phone installation/import and an actual
-AI suggestion remain unverified; each device needs its own OpenRouter connection.
-
-PR #1 was merged at `d592c5a3e0ca445eb4463d6a30a506bfa91239db`. Its Pages build passed,
-but the deployment timed out (`Timeout reached, aborting!`) while awaiting Pages:
-<https://github.com/JoschaChristen/trainingsplan-app/actions/runs/41867685783>.
-This is evidence of a deployment timeout, not proof of its underlying cause.
+**GitHub Pages** still serves the old app at
+<https://joschachristen.github.io/trainingsplan-app/> from the `legacy-pages` branch
+(commit `d592c5a`). Do not delete that branch or disable Pages until the phone
+migration is confirmed.
 
 ## Optional AI
 
@@ -120,26 +103,7 @@ and [structured outputs](https://openrouter.ai/docs/guides/features/structured-o
 AI statements are suggestions; validated figure references cannot guarantee the
 accuracy of all natural-language explanations.
 
-## Verification and limits
+## Verification history
 
-Verified on 2026-11-05:
-
-- Strict TypeScript and production build pass; 18 automated tests pass.
-- Tests cover calculations, fixture migration, duplicate protection, atomic rollback,
-  backup secret exclusion, persistence, session resume, incomplete-plan rollback and
-  AI schema/reference checks with mocked network responses.
-- Chrome UI: imported the synthetic fixture (3 sessions, 25 sets), edited and finished
-  a free session, created/activated a cycle, edited percentage load, added a skill stage.
-- Production build: stopped the server, reloaded successfully, started a planned
-  session offline and retained all three checked sets across another reload.
-- Browser backup download verified: valid JSON with 5 synthetic sessions and 30 sets,
-  no API key.
-- Mobile layouts inspected at 360 px and 390 px. Phone installation, iOS share sheet,
-  the user's real export and a real model request still need device acceptance.
-  OpenRouter OAuth and the data-free key check later succeeded on desktop Chrome
-  after user authorization. No real training data was transmitted.
-- `npm audit --omit=dev`: no known production dependency vulnerabilities. The full
-  audit reports six low/moderate transitive development-tool findings; no high or
-  critical findings remain. Recheck when updating the PWA toolchain.
-
-The local browser test data is synthetic and is not bundled in `dist/`.
+See [`docs/AUDIT-2026-11.md`](docs/AUDIT-2026-11.md) for the technical audit, its
+findings and fixes, what is verified and what still needs a check on the phone.
