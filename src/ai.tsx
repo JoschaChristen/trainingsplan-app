@@ -2,13 +2,12 @@ import { z } from "zod";
 import { useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Sparkles, Check } from "lucide-react";
-import { Header, Card, Field, useApp, useAction, useNotice, Empty } from "./ui";
+import { Header, Card, Field, useApp, useAction, useNotice } from "./ui";
 import { db } from "./db";
 import {
   type Settings,
   type Data,
   type AiRun,
-  type CycleCell,
   uid,
   today,
   formatDate,

@@ -24,7 +24,7 @@ import {
   type Exercise,
   type SkillStage,
 } from "./model";
-import { currentRm, series, plateau, estimate } from "./calculations";
+import { currentRm, series, plateau } from "./calculations";
 const colors = ["#A8D5F7", "#C8F24A", "#BBA7F4", "#EDB47C"];
 export function Progress() {
   const { data } = useApp(),

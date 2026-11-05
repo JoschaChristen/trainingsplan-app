@@ -10,7 +10,7 @@ import {
   Repeat2,
 } from "lucide-react";
 import { db } from "./db";
-import { uid, type SetLog, fmt } from "./model";
+import { type SetLog, fmt } from "./model";
 import {
   Header,
   Card,

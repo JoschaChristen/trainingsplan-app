@@ -283,8 +283,8 @@ describe("training persistence", () => {
     await db.delete();
   });
   it("resumes unfinished sessions and keeps a changed set across reopen", async () => {
-    let d = await readData(),
-      id = await startSession(d);
+    let d = await readData();
+    const id = await startSession(d);
     d = await readData();
     const se = await addExercise(id, d.exercises[0].id, d);
     await appendSet(se, true);
