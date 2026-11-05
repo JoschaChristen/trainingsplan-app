@@ -95,9 +95,12 @@ client received 403, so a complete remote byte comparison was not performed.
 as `5113c87` on 2026-11-05. Its production deployment
 `fcc7fd2b-6d0a-42d6-bfa5-ce13c44966cd` completed successfully, confirmed in
 Cloudflare and the GitHub Cloudflare Pages check. The main checkout is current.
-Phone installation/import and real OpenRouter connection still require user
-acceptance. The OpenRouter authorization page correctly targets this production
-hostname; the user must approve key creation before the data-free connection test.
+OpenRouter PKCE authorization and the data-free key connection test succeeded
+on desktop Chrome on 2026-11-05. The model `openai/gpt-4.1-mini` and enabled AI
+setting were saved and retained after reload. Its structured-output capability
+was checked against the public model catalogue. No real training data was sent
+and no model completion was requested. Phone installation/import and an actual
+AI suggestion remain unverified; each device needs its own OpenRouter connection.
 
 PR #1 was merged at `d592c5a3e0ca445eb4463d6a30a506bfa91239db`. Its Pages build passed,
 but the deployment timed out (`Timeout reached, aborting!`) while awaiting Pages:
@@ -132,8 +135,9 @@ Verified on 2026-11-05:
 - Browser backup download verified: valid JSON with 5 synthetic sessions and 30 sets,
   no API key.
 - Mobile layouts inspected at 360 px and 390 px. Phone installation, iOS share sheet,
-  the user's real export and a real OpenRouter OAuth/model request still need device
-  acceptance. No credentials were entered or real training data transmitted.
+  the user's real export and a real model request still need device acceptance.
+  OpenRouter OAuth and the data-free key check later succeeded on desktop Chrome
+  after user authorization. No real training data was transmitted.
 - `npm audit --omit=dev`: no known production dependency vulnerabilities. The full
   audit reports six low/moderate transitive development-tool findings; no high or
   critical findings remain. Recheck when updating the PWA toolchain.
