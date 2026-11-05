@@ -91,9 +91,13 @@ The live home, cycles, progress and exercise library were checked in Chrome.
 The app showed offline readiness and no captured browser warnings/errors.
 Loaded JS/CSS asset names matched the locally tested build. A separate HTTP
 client received 403, so a complete remote byte comparison was not performed.
-[PR #2](https://github.com/JoschaChristen/trainingsplan-app/pull/2) tracks the
-production cutover. Phone installation/import and real OpenRouter connection
-still require user acceptance.
+[PR #2](https://github.com/JoschaChristen/trainingsplan-app/pull/2) was merged
+as `5113c87` on 2026-11-05. Its production deployment
+`fcc7fd2b-6d0a-42d6-bfa5-ce13c44966cd` completed successfully, confirmed in
+Cloudflare and the GitHub Cloudflare Pages check. The main checkout is current.
+Phone installation/import and real OpenRouter connection still require user
+acceptance. The OpenRouter authorization page correctly targets this production
+hostname; the user must approve key creation before the data-free connection test.
 
 PR #1 was merged at `d592c5a3e0ca445eb4463d6a30a506bfa91239db`. Its Pages build passed,
 but the deployment timed out (`Timeout reached, aborting!`) while awaiting Pages:
