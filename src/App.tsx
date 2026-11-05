@@ -65,6 +65,14 @@ function Shell() {
     }
   }, [notice]);
   useEffect(() => {
+    // The offline-ready note is informational and covers the header, so it
+    // hides itself; the update prompt stays until the user decides.
+    if (offline && !update) {
+      const t = setTimeout(() => setOffline(false), 6000);
+      return () => clearTimeout(t);
+    }
+  }, [offline, update, setOffline]);
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
   if (error)
@@ -108,7 +116,9 @@ function Shell() {
               element={
                 <>
                   <h1>Seite nicht gefunden</h1>
-                  <Link to="/">Zur Übersicht</Link>
+                  <Link className="text-link" to="/">
+                    Zur Übersicht
+                  </Link>
                 </>
               }
             />
