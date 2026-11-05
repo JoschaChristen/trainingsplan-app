@@ -14,6 +14,10 @@ test("the installed app opens and saves offline", async ({ page, context }) => {
   await page.getByLabel("Bankdrücken Satz 1 kg").fill("60");
   await page.getByLabel("Bankdrücken Satz 1 Wiederholungen").fill("8");
   await page.getByRole("button", { name: "Satz 1 abhaken" }).click();
+  // The toggle flips once the write is stored; only then reload.
+  await expect(
+    page.getByRole("button", { name: "Satz 1 wieder öffnen" }),
+  ).toBeVisible();
   await page.reload();
   await expect(page.getByLabel("Bankdrücken Satz 1 kg")).toHaveValue("60");
   await expect(

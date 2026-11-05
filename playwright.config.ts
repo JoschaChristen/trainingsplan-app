@@ -29,6 +29,8 @@ export default defineConfig({
   webServer: {
     command: `npx vite preview --host 127.0.0.1 --port ${port} --strictPort`,
     url: `http://127.0.0.1:${port}/`,
-    reuseExistingServer: !process.env.CI,
+    // Never reuse a server that is already running: it may serve an older
+    // build. A busy port fails fast instead (--strictPort).
+    reuseExistingServer: false,
   },
 });

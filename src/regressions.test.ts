@@ -89,6 +89,16 @@ describe("calculations and display", () => {
     );
     expect(plateau(squat, d, "2026-11-06")).toBe(true);
   });
+  it("ignores a session exactly 12 weeks ago for plateau detection", () => {
+    // Recent 6 weeks 105 kg, the 6 weeks before 100 kg: progress, no plateau.
+    // A 120 kg session exactly 84 days ago lies outside both windows.
+    const d = weekly(
+      [105, 105, 105, 105, 105, 105, 100, 100, 100, 100, 100, 100, 120],
+      "2026-11-06",
+      0,
+    );
+    expect(plateau(squat, d, "2026-11-06")).toBe(false);
+  });
   it("shows 1.25 kg steps with two decimals", () => {
     expect(fmt(41.25)).toBe("41.25");
     expect(fmt(102.5)).toBe("102.5");
