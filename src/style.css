@@ -1127,10 +1127,9 @@ ul {
     padding-right: 12px;
   }
   .set-row {
-    grid-template-columns: 20px 44px minmax(38px, 1fr) minmax(
-        38px,
-        1fr
-      ) 44px 44px;
+    grid-template-columns:
+      20px 44px minmax(38px, 1fr) minmax(38px, 1fr)
+      44px 44px;
     gap: 3px;
   }
   .set-row input {
