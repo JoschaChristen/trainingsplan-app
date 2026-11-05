@@ -231,4 +231,4 @@ export const formatDate = (d: string) =>
     year: "numeric",
   }).format(new Date(d + "T12:00:00"));
 export const fmt = (n: number) =>
-  new Intl.NumberFormat("de-CH", { maximumFractionDigits: 1 }).format(n);
+  new Intl.NumberFormat("de-CH", { maximumFractionDigits: 2 }).format(n);

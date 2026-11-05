@@ -56,7 +56,7 @@ export function series(exercise: Exercise, d: Data) {
 }
 export function currentRm(e: Exercise, d: Data, asOf = today()) {
   const points = series(e, d).filter(
-    (p) => p.date >= dateAdd(asOf, -42) && p.date <= asOf,
+    (p) => p.date > dateAdd(asOf, -42) && p.date <= asOf,
   );
   const best = points.sort(
     (a, b) => b.value - a.value || b.date.localeCompare(a.date),
@@ -82,13 +82,26 @@ export function loadKg(c: CycleCell, e: Exercise, d: Data) {
     ? Math.round(((c.pct / 100) * rm.value) / e.weightStep) * e.weightStep
     : undefined;
 }
+// Linear weekly progression used by "Auf folgende Wochen übertragen".
+// kg rounds to the weight step; percentages round to 2 decimals so that
+// floating-point noise (70 * 1.08 = 75.60000000000001) is never stored.
+export function progressed(
+  value: number,
+  incrementPct: number,
+  weeksAhead: number,
+  step?: number,
+) {
+  const raw = value * (1 + (incrementPct / 100) * weeksAhead);
+  return step ? Math.round(raw / step) * step : Math.round(raw * 100) / 100;
+}
 export function plateau(e: Exercise, d: Data, asOf = today()) {
   const points = series(e, d).filter(
-    (p) => p.date >= dateAdd(asOf, -84) && p.date <= asOf,
+    (p) => p.date > dateAdd(asOf, -84) && p.date <= asOf,
   );
   if (new Set(points.map((p) => p.sessionId)).size < 6) return false;
-  const recent = points.filter((p) => p.date >= dateAdd(asOf, -42)),
-    before = points.filter((p) => p.date < dateAdd(asOf, -42));
+  // Two windows of exactly 42 days each: (asOf-42, asOf] and (asOf-84, asOf-42].
+  const recent = points.filter((p) => p.date > dateAdd(asOf, -42)),
+    before = points.filter((p) => p.date <= dateAdd(asOf, -42));
   return (
     !!recent.length &&
     !!before.length &&

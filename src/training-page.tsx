@@ -23,7 +23,7 @@ import {
   useNotice,
   useAction,
 } from "./ui";
-import { addExercise, appendSet } from "./training";
+import { addExercise, appendSet, swapExercise } from "./training";
 import { personalRecords, volume, platesFor } from "./calculations";
 export function Training() {
   const { id } = useParams(),
@@ -409,32 +409,8 @@ export function Training() {
           onClose={() => setPicker(false)}
           onPick={(e) =>
             void run(async () => {
-              if (swap) {
-                const se = entries.find((s) => s.id === swap)!;
-                if (allSets.some((s) => s.sessionExerciseId === swap && s.done))
-                  throw Error(
-                    "Eine Übung mit abgehakten Sätzen bleibt erhalten. Füge die Ersatzübung zusätzlich hinzu.",
-                  );
-                await db.transaction(
-                  "rw",
-                  db.sessionExercises,
-                  db.sets,
-                  async () => {
-                    await db.sets
-                      .where("sessionExerciseId")
-                      .equals(swap)
-                      .delete();
-                    await db.sessionExercises.delete(swap);
-                    const newId = await addExercise(session.id, e.id, data);
-                    await db.sessionExercises.update(newId, {
-                      order: se.order,
-                      status: "substituted",
-                      substitutedFromExerciseId: se.exerciseId,
-                    });
-                    setExpanded(newId);
-                  },
-                );
-              } else setExpanded(await addExercise(session.id, e.id, data));
+              if (swap) setExpanded(await swapExercise(swap, e.id, data));
+              else setExpanded(await addExercise(session.id, e.id, data));
               setPicker(false);
             })
           }

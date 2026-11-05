@@ -31,7 +31,7 @@ import {
   useAction,
   formValue,
 } from "./ui";
-import { currentRm, loadKg } from "./calculations";
+import { currentRm, loadKg, progressed } from "./calculations";
 import { cycleWeek } from "./overview";
 import { startSession } from "./training";
 export function Cycles() {
@@ -688,14 +688,11 @@ function CellEditor({
                   pct:
                     v.pct === undefined
                       ? undefined
-                      : v.pct * (1 + (increment / 100) * i),
+                      : progressed(v.pct, increment, i),
                   kg:
                     v.kg === undefined
                       ? undefined
-                      : Math.round(
-                          (v.kg * (1 + (increment / 100) * i)) /
-                            exercise.weightStep,
-                        ) * exercise.weightStep,
+                      : progressed(v.kg, increment, i, exercise.weightStep),
                 }),
             );
             await db.cells.bulkPut(cells);
