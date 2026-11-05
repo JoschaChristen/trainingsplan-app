@@ -118,22 +118,32 @@ export function mappingsFor(raw: Legacy): Mapping[] {
     return { legacyId: e.id, name, type, category };
   });
 }
+const zurichDate = (t: number | string) =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Zurich",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(t));
+type LegacyRow = Legacy["setLogs"][number];
+// A row carries data if it records sets, a note, or a skip/substitution.
+const rowHasData = (r: LegacyRow) =>
+  r.status !== "planned" ||
+  !!r.note?.trim() ||
+  r.sets.some((s) => s.weight != null || s.reps != null);
+// Plan weeks with at least one setLog with data (LEGACY-IMPORT.md).
+const weeksWithData = (raw: Legacy) => [
+  ...new Set(raw.setLogs.filter(rowHasData).map((r) => r.week)),
+];
 export function datesFor(raw: Legacy): Record<number, string> {
   return Object.fromEntries(
-    [...new Set(raw.setLogs.map((r) => r.week))].map((week) => {
+    weeksWithData(raw).map((week) => {
       const times = raw.setLogs
         .filter((r) => r.week === week && r.updatedAt)
         .map((r) => r.updatedAt!);
       return [
         week,
-        times.length
-          ? new Intl.DateTimeFormat("en-CA", {
-              timeZone: "Europe/Zurich",
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(new Date(Math.min(...times)))
-          : raw.exportedAt.slice(0, 10),
+        zurichDate(times.length ? Math.min(...times) : raw.exportedAt),
       ];
     }),
   );
@@ -233,7 +243,7 @@ export function convertLegacy(
           .join(" · "),
       });
     }
-  for (const week of [...new Set(raw.setLogs.map((r) => r.week))]) {
+  for (const week of weeksWithData(raw)) {
     if (!knownWeeks.has(week))
       throw Error("Trainingswoche fehlt im alten Plan: " + week);
     const date = dates[week];
@@ -254,11 +264,20 @@ export function convertLegacy(
       if (!original) throw Error("Unbekannte alte Übung: " + old.exerciseId);
       let e = original;
       if (old.status === "substituted") {
-        if (!old.substituteName?.trim())
-          throw Error("Name einer Ersatzübung fehlt.");
+        // The old app stores "" or null until a substitute name is typed.
+        // One placeholder per original lift, kept out of 1RM tracking so
+        // unknown substitutes never feed another lift's estimates.
+        const typed = old.substituteName?.trim(),
+          name = typed || "Ersatz für " + original.name;
         e = d.exercises.find(
-          (x) => x.name === old.substituteName && x.type === original.type,
-        ) ?? { ...original, id: uid(), name: old.substituteName, aliases: [] };
+          (x) => x.name === name && x.type === original.type,
+        ) ?? {
+          ...original,
+          id: uid(),
+          name,
+          aliases: [],
+          ...(typed ? {} : { trackOneRm: false }),
+        };
         if (!d.exercises.some((x) => x.id === e.id)) d.exercises.push(e);
       }
       const seId = uid();
@@ -351,6 +370,47 @@ export function validateRelations(d: Data) {
   if (d.cycles.filter((c) => c.status === "active").length > 1)
     throw Error("Es darf nur ein Zyklus aktiv sein.");
 }
+const sameExercise = (a: Exercise, b: Exercise) =>
+  a.name.trim().toLowerCase() === b.name.trim().toLowerCase() &&
+  a.type === b.type;
+// Points every exercise reference in `d` from an old id to a new one.
+function remapExerciseRefs(d: Data, remap: Map<string, string>) {
+  const mapped = (id: string) => remap.get(id) ?? id;
+  for (const entry of d.entries) entry.exerciseId = mapped(entry.exerciseId);
+  for (const se of d.sessionExercises) {
+    se.exerciseId = mapped(se.exerciseId);
+    if (se.substitutedFromExerciseId)
+      se.substitutedFromExerciseId = mapped(se.substitutedFromExerciseId);
+  }
+  for (const set of d.sets) set.exerciseId = mapped(set.exerciseId);
+  for (const rm of d.oneRms) rm.exerciseId = mapped(rm.exerciseId);
+  for (const stage of d.stages)
+    if (stage.exerciseId) stage.exerciseId = mapped(stage.exerciseId);
+}
+// Merging a backup into another install: every install seeds the default
+// exercises with fresh ids, so match unknown ids by name and type instead of
+// creating duplicates. The incoming fields win, the existing id is kept.
+function reuseExercisesByName(incoming: Data, existing: Exercise[]) {
+  const incomingIds = new Set(incoming.exercises.map((e) => e.id)),
+    existingIds = new Set(existing.map((e) => e.id)),
+    remap = new Map<string, string>();
+  for (const exercise of incoming.exercises) {
+    if (existingIds.has(exercise.id)) continue;
+    const match = existing.find(
+      (e) =>
+        !incomingIds.has(e.id) &&
+        ![...remap.values()].includes(e.id) &&
+        sameExercise(e, exercise),
+    );
+    if (!match) continue;
+    remap.set(exercise.id, match.id);
+    exercise.aliases = [
+      ...new Set([...(match.aliases ?? []), ...(exercise.aliases ?? [])]),
+    ];
+    exercise.id = match.id;
+  }
+  remapExerciseRefs(incoming, remap);
+}
 export async function importData(
   incoming: Data,
   mode: "merge" | "replace",
@@ -361,6 +421,7 @@ export async function importData(
   await database.transaction("rw", database.tables, async () => {
     const existing = await readData(database),
       combined = emptyData();
+    if (mode === "merge") reuseExercisesByName(safe, existing.exercises);
     for (const k of tableNames)
       (combined[k] as unknown[]) =
         mode === "replace"
@@ -391,11 +452,7 @@ export async function importLegacyData(data: Data, database = db) {
       existing = await database.exercises.toArray();
     const remap = new Map<string, string>();
     for (const exercise of incoming.exercises) {
-      const match = existing.find(
-        (e) =>
-          e.name.trim().toLowerCase() === exercise.name.trim().toLowerCase() &&
-          e.type === exercise.type,
-      );
+      const match = existing.find((e) => sameExercise(e, exercise));
       if (match) {
         remap.set(exercise.id, match.id);
         Object.assign(exercise, {
@@ -406,18 +463,7 @@ export async function importLegacyData(data: Data, database = db) {
         });
       }
     }
-    const mapped = (id: string) => remap.get(id) ?? id;
-    for (const entry of incoming.entries)
-      entry.exerciseId = mapped(entry.exerciseId);
-    for (const se of incoming.sessionExercises) {
-      se.exerciseId = mapped(se.exerciseId);
-      if (se.substitutedFromExerciseId)
-        se.substitutedFromExerciseId = mapped(se.substitutedFromExerciseId);
-    }
-    for (const set of incoming.sets) set.exerciseId = mapped(set.exerciseId);
-    for (const rm of incoming.oneRms) rm.exerciseId = mapped(rm.exerciseId);
-    for (const stage of incoming.stages)
-      if (stage.exerciseId) stage.exerciseId = mapped(stage.exerciseId);
+    remapExerciseRefs(incoming, remap);
     await importData(incoming, "merge", database);
   });
 }
@@ -434,8 +480,9 @@ export function makeBackup(d: Data) {
     data: copy,
   };
 }
-export async function exportBackup() {
-  const data = makeBackup(await readData());
+// Returns false when the user cancelled the share sheet (nothing was saved).
+export async function exportBackup(database: TrainingDB = db) {
+  const data = makeBackup(await readData(database));
   const file = new File(
     [JSON.stringify(data, null, 2)],
     `trainingsplan-backup-${today()}.json`,
@@ -445,13 +492,14 @@ export async function exportBackup() {
     try {
       await navigator.share({ files: [file], title: "Trainingsplan Backup" });
     } catch (e) {
-      if (e instanceof DOMException && e.name === "AbortError") return;
+      if (e instanceof DOMException && e.name === "AbortError") return false;
       download(file);
     }
   } else download(file);
-  await db.settings.update("settings", {
+  await database.settings.update("settings", {
     lastBackupAt: new Date().toISOString(),
   });
+  return true;
 }
 function download(file: File) {
   const url = URL.createObjectURL(file),

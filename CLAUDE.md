@@ -4,15 +4,16 @@ Personal training PWA for one user (Joscha, Switzerland). Lifts + 1RM tracking,
 variable-length training cycles, bodyweight skills, AI planning via OpenRouter.
 
 ## Read first
-- `docs/ROADMAP.md` — stages; work on exactly one stage per session.
+- `docs/ROADMAP.md` — stages (all implemented; follow-up work: one topic per branch + PR).
 - `docs/SPEC.md` — features, data model, calculations, AI contracts.
 - `docs/design/README.md` — design tokens and how to read the screen files in `docs/design/screens/`.
 - `docs/LEGACY-IMPORT.md` — migrating data from the old app.
 
 ## State of the repo
-Until stage 1 is merged, the repo root is still the **old app** (vanilla JS, live on
-GitHub Pages, holds the user's data). Do not modify or delete it unless the current
-stage says so, and never before the user has confirmed the stage-0 export.
+All stages are implemented and live on Cloudflare Pages from `main`. The old app is
+kept unchanged in `legacy/` and is still served by GitHub Pages from the
+`legacy-pages` branch (it may still hold data on the phone): never modify `legacy/`,
+never delete or rewrite `legacy-pages`.
 
 ## Rules
 - UI text in Swiss Standard German: «ss» instead of «ß», dates `17.10.2026`,
@@ -26,11 +27,16 @@ stage says so, and never before the user has confirmed the stage-0 export.
 - Data safety: Dexie schema changes are additive with tested migrations; backup export
   must always work.
 - Mobile first: 360–430 px, touch targets ≥ 44 px, safe-area insets, works offline.
-- Keep changes scoped to the current stage. No drive-by refactors.
+- Keep changes scoped to the task at hand. No drive-by refactors.
 - The user is not a full-time developer: in PR descriptions, explain in plain language
   what changed and how to test it on the phone (preview URL steps).
 
-## Commands (after stage 1)
+## Commands
 - `npm run dev` — dev server
 - `npm run build` — production build to `dist`
-- `npm test` — Vitest
+- `npm test` — Vitest unit tests
+- `npm run test:e2e` — Playwright against `dist` (build first)
+- `npm run typecheck`, `npm run lint`, `npm run format:check`
+
+GitHub Actions CI runs all checks on every PR; keep them green. A bug fix comes
+with a regression test.

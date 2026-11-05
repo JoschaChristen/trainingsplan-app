@@ -5,3 +5,10 @@ dist/
 coverage/
 *.tsbuildinfo
 release/
+test-results/
+playwright-report/
+
+# Real exports/backups contain personal training data: never commit them.
+trainingsplan-export-*.json
+trainingsplan-backup-*.json
+*.log

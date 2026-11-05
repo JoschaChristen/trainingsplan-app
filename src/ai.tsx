@@ -2,15 +2,15 @@ import { z } from "zod";
 import { useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Sparkles, Check } from "lucide-react";
-import { Header, Card, Field, useApp, useAction, useNotice, Empty } from "./ui";
+import { Header, Card, Field, useApp, useAction, useNotice } from "./ui";
 import { db } from "./db";
 import {
   type Settings,
   type Data,
   type AiRun,
-  type CycleCell,
   uid,
   today,
+  formatDate,
   criterionSchema,
   aiKinds,
   cellSchema,
@@ -36,6 +36,20 @@ const proposalCell = z.object({
   kg: num.max(1000).nullable(),
   note: z.string(),
 });
+const fieldUnit = {
+  pct: "%",
+  kg: "kg",
+  sets: "Sätze",
+  reps: "Wdh",
+  seconds: "s",
+} as const;
+// Figures carry ISO dates ("2026-10-17") or months ("2026-10").
+const displayDate = (d: string) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(d)
+    ? formatDate(d)
+    : /^\d{4}-\d{2}$/.test(d)
+      ? d.slice(5) + "." + d.slice(0, 4)
+      : d;
 export const schemas = {
   cycle_plan: z.object({
     days: z
@@ -157,7 +171,10 @@ export function summarize(d: Data) {
   for (const r of d.oneRms) {
     const e = d.exercises.find((e) => e.id === r.exerciseId);
     figures.push({
-      label: (e?.name ?? "Übung") + " · " + r.source,
+      label:
+        (e?.name ?? "Übung") +
+        " · " +
+        (r.source === "tested" ? "getestet" : "manuell"),
       value: r.value,
       date: r.date,
     });
@@ -419,6 +436,14 @@ export function finishOAuth() {
   const url = new URL(location.href),
     code = url.searchParams.get("code");
   if (!code) return Promise.resolve();
+  // Removes the one-time OAuth parameters so a reload never repeats the attempt.
+  const clearCallback = () => {
+    sessionStorage.removeItem("openrouter-pkce");
+    url.searchParams.delete("code");
+    url.searchParams.delete("state");
+    url.hash = "/settings";
+    history.replaceState(null, "", url.href);
+  };
   oauthPromise = (async () => {
     const raw = sessionStorage.getItem("openrouter-pkce");
     if (!raw) throw Error("OpenRouter-Anmeldung bitte erneut starten.");
@@ -442,13 +467,12 @@ export function finishOAuth() {
       openRouterApiKey: value.key,
       aiEnabled: true,
     });
-    sessionStorage.removeItem("openrouter-pkce");
-    url.searchParams.delete("code");
-    url.searchParams.delete("state");
-    url.hash = "/settings";
-    history.replaceState(null, "", url.href);
+    clearCallback();
     location.reload();
-  })();
+  })().catch((e) => {
+    clearCallback();
+    throw e;
+  });
   return oauthPromise;
 }
 export async function testConnection(s: Settings) {
@@ -635,7 +659,15 @@ export function AiPage() {
         <>
           <div className="section-title">
             <h2>Vorschlag</h2>
-            <small>{new Date(latest.createdAt).toLocaleString("de-CH")}</small>
+            <small>
+              {new Date(latest.createdAt).toLocaleString("de-CH", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </small>
           </div>
           <AiResult
             run={latest}
@@ -645,6 +677,21 @@ export function AiPage() {
       )}
     </>
   );
+}
+// Reads the latest decisions inside the transaction, so two quick taps on
+// different items never overwrite each other.
+export async function saveDecision(
+  runId: string,
+  key: string,
+  value: "accepted" | "rejected",
+) {
+  await db.transaction("rw", db.aiRuns, async () => {
+    const current = await db.aiRuns.get(runId);
+    if (!current) throw Error("KI-Ergebnis nicht gefunden.");
+    await db.aiRuns.update(runId, {
+      decisions: { ...current.decisions, [key]: value },
+    });
+  });
 }
 export function AiResult({
   run: ai,
@@ -659,11 +706,22 @@ export function AiResult({
     decisions =
       data.aiRuns.find((r) => r.id === ai.id)?.decisions ?? ai.decisions ?? {};
   const decide = async (key: string, value: "accepted" | "rejected") => {
-    await db.aiRuns.update(ai.id, {
-      decisions: { ...decisions, [key]: value },
-    });
+    await saveDecision(ai.id, key, value);
     onSaved();
   };
+  // A stored result that no longer matches its schema (older version, edited
+  // backup) must not crash the whole app during render.
+  if (!schemas[ai.kind].safeParse(ai.output).success)
+    return (
+      <Card>
+        <h2>KI-Ergebnis nicht lesbar</h2>
+        <p className="muted">
+          Dieses gespeicherte Ergebnis passt nicht mehr zum erwarteten Format.
+          Dein Training wurde nicht verändert. Starte bei Bedarf eine neue
+          Anfrage.
+        </p>
+      </Card>
+    );
   if (ai.kind === "cycle_plan") {
     const r = schemas.cycle_plan.parse(ai.output);
     return (
@@ -709,7 +767,7 @@ export function AiResult({
                 async () => {
                   await db.cycles.add({
                     id,
-                    name: "KI-Entwurf · " + today(),
+                    name: "KI-Entwurf · " + formatDate(today()),
                     weeks,
                     startDate: today(),
                     deloadWeeks: [],
@@ -783,17 +841,8 @@ export function AiResult({
               }
             </h2>
             <div className="adjustment">
-              {a.from} → <strong>{a.to}</strong>{" "}
-              {
-                {
-                  pct: "%",
-                  kg: "kg",
-                  sets: "Sätze",
-                  reps: "Wdh",
-                  seconds: "s",
-                }[a.field]
-              }{" "}
-              · Woche {a.week}
+              {a.from} → <strong>{a.to}</strong> {fieldUnit[a.field]} · Woche{" "}
+              {a.week}
             </div>
             <p>{a.reason}</p>
             {decisions[String(i)] ? (
@@ -883,7 +932,7 @@ export function AiResult({
             <p>{o.description}</p>
             {o.cycleChanges.map((c, j) => (
               <p className="muted" key={j}>
-                Woche {c.week}: {c.field} {c.from} → {c.to}
+                Woche {c.week}: {c.from} → {c.to} {fieldUnit[c.field]}
               </p>
             ))}
             {o.cycleChanges.length > 0 && (
@@ -1082,7 +1131,7 @@ export function AiResult({
             <div className="row history-set" key={i}>
               <span>
                 {f.label}
-                <small>{f.date}</small>
+                <small>{displayDate(f.date)}</small>
               </span>
               <strong>{f.value}</strong>
             </div>

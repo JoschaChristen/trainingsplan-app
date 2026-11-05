@@ -67,6 +67,39 @@ export async function addExercise(
   });
   return seId;
 }
+export async function swapExercise(
+  sessionExerciseId: string,
+  exerciseId: string,
+  d: Data,
+) {
+  return db.transaction(
+    "rw",
+    db.sessions,
+    db.sessionExercises,
+    db.sets,
+    async () => {
+      const se = await db.sessionExercises.get(sessionExerciseId);
+      if (!se) throw Error("Übung nicht gefunden.");
+      const sets = await db.sets
+        .where("sessionExerciseId")
+        .equals(sessionExerciseId)
+        .toArray();
+      if (sets.some((s) => s.done))
+        throw Error(
+          "Eine Übung mit abgehakten Sätzen bleibt erhalten. Füge die Ersatzübung zusätzlich hinzu.",
+        );
+      await db.sets.bulkDelete(sets.map((s) => s.id));
+      await db.sessionExercises.delete(sessionExerciseId);
+      const newId = await addExercise(se.sessionId, exerciseId, d);
+      await db.sessionExercises.update(newId, {
+        order: se.order,
+        status: "substituted",
+        substitutedFromExerciseId: se.exerciseId,
+      });
+      return newId;
+    },
+  );
+}
 export async function startSession(d: Data, dayId?: string, week?: number) {
   const existing = d.sessions.find((s) => s.startedAt && !s.finishedAt);
   if (existing) return existing.id;

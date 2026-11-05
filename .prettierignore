@@ -1,0 +1,8 @@
+# Reference material and the preserved old app are kept byte-for-byte.
+legacy/
+docs/
+*.md
+dist/
+coverage/
+playwright-report/
+test-results/

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { requestAi, schemas, summarize, validateAi } from "./ai";
+import { requestAi, summarize, validateAi } from "./ai";
 import { db, readData, seed } from "./db";
 import { defaults, emptyData, type Data } from "./model";
 

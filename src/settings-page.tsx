@@ -83,10 +83,10 @@ export function SettingsPage() {
           disabled={busy}
           onClick={() =>
             void run(async () => {
-              await exportBackup();
-              notify(
-                "Backup bereit. Bewahre die Datei ausserhalb der App auf.",
-              );
+              if (await exportBackup())
+                notify(
+                  "Backup bereit. Bewahre die Datei ausserhalb der App auf.",
+                );
             })
           }
         >

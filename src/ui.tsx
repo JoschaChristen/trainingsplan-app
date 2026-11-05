@@ -9,6 +9,7 @@ import {
 } from "react";
 import { X, ArrowLeft, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ZodError } from "zod";
 import { type Data, type Exercise, type Settings, defaults } from "./model";
 export const DataContext = createContext<Data>(null!);
 export const useApp = () => {
@@ -17,6 +18,16 @@ export const useApp = () => {
 };
 export const NoticeContext = createContext<(text: string) => void>(() => {});
 export const useNotice = () => useContext(NoticeContext);
+// Validation and parser errors carry English developer text; show German.
+export function errorText(e: unknown) {
+  if (e instanceof ZodError)
+    return "Ungültige Werte. Bitte Eingaben prüfen, es wurde nichts gespeichert.";
+  if (e instanceof SyntaxError)
+    return "Die Daten konnten nicht gelesen werden (ungültiges Format).";
+  return e instanceof Error && e.message
+    ? e.message
+    : "Die Aktion konnte nicht gespeichert werden.";
+}
 export function useAction() {
   const notify = useNotice(),
     [busy, setBusy] = useState(false);
@@ -28,11 +39,7 @@ export function useAction() {
       try {
         await fn();
       } catch (e) {
-        notify(
-          e instanceof Error
-            ? e.message
-            : "Die Aktion konnte nicht gespeichert werden.",
-        );
+        notify(errorText(e));
       } finally {
         setBusy(false);
       }
@@ -174,8 +181,11 @@ export function Num({
       onChange={(e) => {
         setRaw(e.target.value);
         const n = e.target.valueAsNumber;
-        if (e.target.value === "") onChange(undefined);
-        else if (
+        // An unparsable partial entry also reports "", but must not clear
+        // the stored value; only a really empty field does.
+        if (e.target.value === "") {
+          if (!e.target.validity.badInput) onChange(undefined);
+        } else if (
           Number.isFinite(n) &&
           n >= min &&
           n <= max &&
