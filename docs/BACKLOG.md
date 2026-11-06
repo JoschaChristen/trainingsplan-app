@@ -43,11 +43,12 @@ Known and intended, no action: backup restore switches AI off (the key is kept).
 
 | Item | Status | Notes |
 | ---- | ------ | ----- |
-| Delete merged/obsolete branches | needs owner | List with restore SHAs in `AUDIT-2026-11.md` |
-| Branch protection for `main` and `legacy-pages` (block deletion and force pushes) | needs owner | Deleting `legacy-pages` takes the old app offline |
-| Require the CI check before merging into `main` | needs owner | Optional |
+| Require the CI check before merging into `main` | needs owner | Optional; not visible from a session, confirm in Settings → Branches |
 | Disable GitHub Pages once the import worked on the phone | needs owner | Old app data on the phone stays until then; never delete `legacy-pages` |
 
 ## Done
 
-_Nothing yet._
+| Item | Done | Notes |
+| ---- | ---- | ----- |
+| Delete merged/obsolete branches | 06.11.2026 | Only `main`, `legacy-pages` and open PR branches remain |
+| Branch protection for `main` and `legacy-pages` | 06.11.2026 | GitHub reports both branches as protected |
