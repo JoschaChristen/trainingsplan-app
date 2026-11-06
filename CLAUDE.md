@@ -5,6 +5,8 @@ variable-length training cycles, bodyweight skills, AI planning via OpenRouter.
 
 ## Read first
 - `docs/ROADMAP.md` — stages (all implemented; follow-up work: one topic per branch + PR).
+- `docs/BACKLOG.md` — open follow-up work and its status; update it in the PR that
+  changes an item.
 - `docs/SPEC.md` — features, data model, calculations, AI contracts.
 - `docs/design/README.md` — design tokens and how to read the screen files in `docs/design/screens/`.
 - `docs/LEGACY-IMPORT.md` — migrating data from the old app.
