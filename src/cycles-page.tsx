@@ -41,7 +41,7 @@ export function Cycles() {
     { busy, run } = useAction();
   return (
     <>
-      <Header title="Deine Zyklen" sub="Planen. Trainieren. Weiterkommen.">
+      <Header title="Deine Zyklen">
         <button
           className="icon"
           aria-label="Zyklus erstellen"

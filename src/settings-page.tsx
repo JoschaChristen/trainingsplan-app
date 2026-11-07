@@ -72,7 +72,6 @@ export function SettingsPage() {
     <>
       <Header title="Einstellungen" back="/" />
       <Card>
-        <span className="eyebrow">Deine Daten gehören dir</span>
         <h2>Backup & Übernahme</h2>
         <p>
           Trainingsdaten werden auf diesem Gerät gespeichert. Sichere

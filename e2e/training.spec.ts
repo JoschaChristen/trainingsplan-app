@@ -108,3 +108,49 @@ test("a planned session starts from the active cycle", async ({ page }) => {
   );
   expect(errors).toEqual([]);
 });
+
+test("a finished session can be deleted from its detail view", async ({
+  page,
+}) => {
+  const errors = watchErrors(page);
+  await startFreeSessionWith(page, "Kniebeuge");
+  await page.getByLabel("Kniebeuge Satz 1 kg").fill("100");
+  await page.getByRole("button", { name: "Satz 1 abhaken" }).click();
+  await page.getByRole("button", { name: /Einheit abschliessen/ }).click();
+  await sheet(page).getByRole("button", { name: "Training speichern" }).click();
+  await page.waitForURL(/#\/history\//);
+  await page.getByRole("button", { name: "Training löschen" }).click();
+  await expect(sheet(page)).toContainText("mit 3 Sätzen wird gelöscht");
+  await sheet(page).getByRole("button", { name: "Training löschen" }).click();
+  await page.waitForURL(/#\/training$/);
+  await expect(page.getByText("0 abgeschlossen")).toBeVisible();
+  const d = await dump(page);
+  expect(d.sessions).toHaveLength(0);
+  expect(d.sessionExercises).toHaveLength(0);
+  expect(d.sets).toHaveLength(0);
+  expect(errors).toEqual([]);
+});
+
+test("a running session can be discarded and the back button leads to the list", async ({
+  page,
+}) => {
+  const errors = watchErrors(page);
+  await startFreeSessionWith(page, "Kniebeuge");
+  await page
+    .getByRole("link", { name: "Zurück zur Trainingsübersicht" })
+    .click();
+  await page.waitForURL(/#\/training$/);
+  await page.getByRole("button", { name: "Training fortsetzen" }).click();
+  await page.waitForURL(/#\/session\//);
+  await page.getByRole("button", { name: "Training verwerfen" }).click();
+  await sheet(page).getByRole("button", { name: "Abbrechen" }).click();
+  expect((await dump(page)).sessions).toHaveLength(1);
+  await page.getByRole("button", { name: "Training verwerfen" }).click();
+  await sheet(page).getByRole("button", { name: "Training löschen" }).click();
+  await page.waitForURL(/#\/training$/);
+  await expect(
+    page.getByRole("button", { name: "Freies Training starten" }),
+  ).toBeVisible();
+  expect((await dump(page)).sessions).toHaveLength(0);
+  expect(errors).toEqual([]);
+});
