@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ZodError, z } from "zod";
 import fixture from "../docs/legacy/sample-export.json";
 import { db, readData, seed } from "./db";
-import { currentRm, plateau, progressed } from "./calculations";
+import { currentRm, forwardWeeks, plateau, progressed } from "./calculations";
 import {
   convertLegacy,
   datesFor,
@@ -25,7 +25,7 @@ import {
 } from "./model";
 import { addExercise, startSession, swapExercise } from "./training";
 import { finishOAuth, saveDecision } from "./ai";
-import { errorText } from "./ui";
+import { attempt, errorText } from "./ui";
 
 const squat: Exercise = {
   id: "squat",
@@ -110,6 +110,12 @@ describe("calculations and display", () => {
     expect(progressed(80, 2.5, 2, 2.5)).toBe(85);
     expect(progressed(41.25, 0, 3, 1.25)).toBe(41.25);
   });
+  it("copies a cell forward without overwriting deload weeks", () => {
+    expect(forwardWeeks(2, 8, [4, 8])).toEqual([2, 3, 5, 6, 7]);
+    // An edited deload week itself is still written.
+    expect(forwardWeeks(4, 6, [4])).toEqual([4, 5, 6]);
+    expect(forwardWeeks(6, 6, [])).toEqual([6]);
+  });
   it("shows German text for validation and parser errors", () => {
     let zodError: unknown;
     try {
@@ -125,6 +131,18 @@ describe("calculations and display", () => {
     expect(errorText(Error("Übung nicht gefunden."))).toBe(
       "Übung nicht gefunden.",
     );
+  });
+  it("turns a failed action into a German notice (useAction)", async () => {
+    const notify = vi.fn();
+    await attempt(() => z.number().parse("x"), notify);
+    await attempt(async () => {
+      throw Error("Übung nicht gefunden.");
+    }, notify);
+    await attempt(async () => {}, notify);
+    expect(notify.mock.calls).toEqual([
+      [expect.stringMatching(/^Ungültige Werte/)],
+      ["Übung nicht gefunden."],
+    ]);
   });
 });
 
@@ -245,6 +263,24 @@ describe("live training and data safety", () => {
       value: 120,
       source: "tested",
     });
+    // An AI cycle plan that was not accepted yet names the exercise by id.
+    backup.aiRuns.push({
+      id: "plan-a",
+      kind: "cycle_plan",
+      createdAt: "2026-10-01T10:00:00Z",
+      model: "test",
+      inputSummary: "",
+      output: {
+        days: [
+          {
+            label: "A",
+            title: "Kraft",
+            entries: [{ exerciseId: tracked.id, cells: [] }],
+          },
+        ],
+        rationale: "",
+      },
+    });
     const exported = makeBackup(backup).data;
     // Device B: a fresh install seeds the same names with new ids.
     await db.delete();
@@ -261,6 +297,10 @@ describe("live training and data safety", () => {
     expect(merged.oneRms.find((r) => r.id === "rm-a")?.exerciseId).toBe(
       squatB[0].id,
     );
+    const plan = merged.aiRuns.find((r) => r.id === "plan-a")!.output as {
+      days: { entries: { exerciseId: string }[] }[];
+    };
+    expect(plan.days[0].entries[0].exerciseId).toBe(squatB[0].id);
     // Merging the same backup again changes nothing.
     await importData(exported, "merge");
     expect((await readData()).exercises).toHaveLength(merged.exercises.length);

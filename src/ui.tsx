@@ -28,6 +28,17 @@ export function errorText(e: unknown) {
     ? e.message
     : "Die Aktion konnte nicht gespeichert werden.";
 }
+// Runs an action and shows a failure as a German notice instead of throwing.
+export async function attempt(
+  fn: () => unknown,
+  notify: (text: string) => void,
+) {
+  try {
+    await fn();
+  } catch (e) {
+    notify(errorText(e));
+  }
+}
 export function useAction() {
   const notify = useNotice(),
     [busy, setBusy] = useState(false);
@@ -37,9 +48,7 @@ export function useAction() {
       if (busy) return;
       setBusy(true);
       try {
-        await fn();
-      } catch (e) {
-        notify(errorText(e));
+        await attempt(fn, notify);
       } finally {
         setBusy(false);
       }

@@ -26,8 +26,9 @@ import {
   type SetLog,
   uid,
   dateAdd,
+  today,
 } from "./model";
-import { startSession, addExercise, appendSet } from "./training";
+import { startSession, addExercise, appendSet, missingRm } from "./training";
 const e: Exercise = {
   id: "squat",
   name: "Kniebeuge",
@@ -297,7 +298,7 @@ describe("training persistence", () => {
     expect((await db.sets.get(work.id))?.weight).toBe(77.5);
     expect(await startSession(await readData())).toBe(id);
   });
-  it("does not create a partial session when percent planning lacks a max", async () => {
+  it("starts a planned day when a percent cell has no current max", async () => {
     const d = await readData(),
       e = d.exercises.find((e) => e.type === "weight_reps")!;
     await db.cycles.add({
@@ -327,9 +328,24 @@ describe("training persistence", () => {
       loadMode: "pct",
       pct: 80,
     });
-    await expect(startSession(await readData(), "day", 1)).rejects.toThrow(
-      "1RM",
+    const id = await startSession(await readData(), "day", 1);
+    const d2 = await readData(),
+      se = d2.sessionExercises.find((x) => x.sessionId === id)!;
+    // The weight stays empty and the training card asks for it.
+    expect(d2.sets.filter((s) => s.sessionExerciseId === se.id)).toHaveLength(
+      3,
     );
-    expect(await db.sessions.count()).toBe(0);
+    expect(d2.sets.every((s) => s.weight === undefined && s.reps === 5)).toBe(
+      true,
+    );
+    expect(missingRm(se, d2)).toBe(true);
+    await db.oneRms.add({
+      id: "rm",
+      exerciseId: e.id,
+      date: today(),
+      value: 100,
+      source: "tested",
+    });
+    expect(missingRm(se, await readData())).toBe(false);
   });
 });

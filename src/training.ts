@@ -1,7 +1,27 @@
 import { db } from "./db";
-import { type Data, type SetLog, uid, today } from "./model";
+import {
+  type Data,
+  type SessionExercise,
+  type SetLog,
+  uid,
+  today,
+} from "./model";
 import { loadKg } from "./calculations";
 import { nextOrder } from "./blocks";
+// Planned in % of the 1RM, but there is no current 1RM to compute the kg.
+export function missingRm(se: SessionExercise, d: Data) {
+  const week = d.sessions.find((s) => s.id === se.sessionId)?.week,
+    cell = d.cells.find(
+      (c) => c.entryId === se.plannedEntryId && c.week === week,
+    ),
+    e = d.exercises.find((x) => x.id === se.exerciseId);
+  return (
+    !!se.plannedEntryId &&
+    cell?.loadMode === "pct" &&
+    !!e &&
+    loadKg(cell, e, d) === undefined
+  );
+}
 export async function addExercise(
   sessionId: string,
   exerciseId: string,
@@ -15,10 +35,8 @@ export async function addExercise(
   const cell = entryId
     ? d.cells.find((c) => c.entryId === entryId && c.week === session.week)
     : undefined;
-  if (cell?.loadMode === "pct" && loadKg(cell, e, d) === undefined)
-    throw Error(
-      `Für ${e.name} fehlt ein aktueller 1RM. Trage ihn unter Fortschritt ein oder plane kg.`,
-    );
+  // A %-cell without a current 1RM leaves the weight empty; the training
+  // card asks for it (missingRm) instead of blocking the whole session.
   const previousSe = d.sessionExercises
     .filter(
       (x) => x.exerciseId === e.id && x.sessionId !== sessionId && !x.blockId,

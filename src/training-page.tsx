@@ -28,6 +28,7 @@ import {
   appendSet,
   deleteSession,
   swapExercise,
+  missingRm,
 } from "./training";
 import { addBlock, addMovement } from "./blocks";
 import { BlockCard, NewBlockSheet } from "./block-card";
@@ -209,6 +210,13 @@ export function Training() {
             </button>
             {isOpen && (
               <>
+                {missingRm(se, data) &&
+                  sets.some((s) => !s.isWarmup && s.weight === undefined) && (
+                    <p className="muted">
+                      Kein aktueller 1RM für die geplanten Prozent: Gewicht
+                      selbst eintragen.
+                    </p>
+                  )}
                 <div className={"set-table " + (!weight ? "no-weight" : "")}>
                   <div className="set-row table-head">
                     <span>Satz</span>

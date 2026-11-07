@@ -95,6 +95,18 @@ export function progressed(
   const raw = value * (1 + (incrementPct / 100) * weeksAhead);
   return step ? Math.round(raw / step) * step : Math.round(raw * 100) / 100;
 }
+// Weeks written by "Auf folgende Wochen übertragen": the edited week and all
+// later weeks of the cycle except deload weeks, whose lighter load is kept.
+export function forwardWeeks(
+  fromWeek: number,
+  weeks: number,
+  deloadWeeks: number[],
+) {
+  return Array.from(
+    { length: weeks - fromWeek + 1 },
+    (_, i) => fromWeek + i,
+  ).filter((w) => w === fromWeek || !deloadWeeks.includes(w));
+}
 export function plateau(e: Exercise, d: Data, asOf = today()) {
   const points = series(e, d).filter(
     (p) => p.date > dateAdd(asOf, -84) && p.date <= asOf,
