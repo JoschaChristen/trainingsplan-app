@@ -69,3 +69,32 @@ test("the AMRAP timer counts rounds and hands the result to the block", async ({
   await expect(page.getByText("3 Runden + 4 Wdh")).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("the same EMOM from two sessions is compared on Fortschritt", async ({
+  page,
+}) => {
+  const errors = watchErrors(page);
+  for (const kg of ["80", "85"]) {
+    await startWithBlock(page, "EMOM");
+    await page.getByLabel("Kniebeuge kg pro Runde").fill(kg);
+    await page.getByLabel("Kniebeuge Wiederholungen pro Runde").fill("3");
+    await page.getByRole("button", { name: "Alle geschafft" }).click();
+    await page.getByRole("button", { name: /Einheit abschliessen/ }).click();
+    await sheet(page)
+      .getByRole("button", { name: "Training speichern" })
+      .click();
+    await page.waitForURL(/#\/history\//);
+  }
+  await open(page, "/progress");
+  await page.getByRole("link", { name: "Blöcke" }).click();
+  await page.waitForURL(/#\/progress\/blocks/);
+  const group = page.getByRole("button", { name: /EMOM 10'/ });
+  await expect(group).toHaveCount(1);
+  await expect(group).toContainText("Kniebeuge");
+  await expect(group).toContainText("2×");
+  await group.click();
+  await expect(sheet(page).getByText("3 Wdh × 85 kg")).toBeVisible();
+  await expect(sheet(page).getByText("3 Wdh × 80 kg")).toBeVisible();
+  await expect(sheet(page).getByText("10/10 Intervalle")).toHaveCount(2);
+  expect(errors).toEqual([]);
+});

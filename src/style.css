@@ -960,6 +960,9 @@ input[type="checkbox"] {
   display: inline;
   font: 14px Barlow;
 }
+.block-score {
+  white-space: nowrap;
+}
 .ai-card {
   background: #0e1f35;
   border: 1.5px solid var(--baby);

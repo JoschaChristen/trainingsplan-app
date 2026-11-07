@@ -36,10 +36,7 @@ housekeeping"), [`ROADMAP.md`](ROADMAP.md) ("After stage 2 is in use").
 | ---- | ------ | ----- |
 | Error toast wiring in `useAction` | open | `errorText` is unit-tested, its use in `useAction` is not |
 | Unaccepted AI cycle plans after merging a backup into another install | open | Exercise ids in stored AI output are not remapped; workaround: request the plan again |
-
-| Workout blocks (EMOM, AMRAP, For Time) in a session | in progress | Branch `claude/workout-blocks`: logging, result, built-in timer |
 | Plan workout blocks in cycles, include them in AI inputs | open | AI summaries still see block sets only as plain sets (volume, best reps) |
-| Compare repeated blocks (same EMOM/AMRAP over time) | open | E.g. a list per block on Fortschritt |
 
 Known and intended, no action: backup restore switches AI off (the key is kept).
 
@@ -54,6 +51,8 @@ Known and intended, no action: backup restore switches AI off (the key is kept).
 
 | Item | Done | Notes |
 | ---- | ---- | ----- |
+| Compare repeated blocks: tab «Blöcke» on Fortschritt | 07.11.2026 | Branch `ccr-492a7b85-yrxhrt` |
+| Workout blocks (EMOM, AMRAP, For Time) in a session: logging, result, built-in timer | 07.11.2026 | PR #6 |
 | Delete sessions, remove filler subtitles, icon back button, simpler "Zyklus planen" card | 07.11.2026 | Branch `claude/app-features-expansion-ll2qf2` |
 | Delete merged/obsolete branches | 06.11.2026 | Only `main`, `legacy-pages` and open PR branches remain |
 | Branch protection for `main` and `legacy-pages` | 06.11.2026 | GitHub reports both branches as protected |

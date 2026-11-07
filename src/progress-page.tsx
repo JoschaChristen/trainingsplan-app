@@ -25,7 +25,23 @@ import {
   type SkillStage,
 } from "./model";
 import { currentRm, series, plateau } from "./calculations";
+import { movementText, repeatedBlocks, scoreText } from "./blocks";
 const colors = ["#A8D5F7", "#C8F24A", "#BBA7F4", "#EDB47C"];
+function Tabs({ active }: { active: string }) {
+  return (
+    <div className="segmented wide">
+      {[
+        ["/progress", "Lifts"],
+        ["/skills", "Skills"],
+        ["/progress/blocks", "Blöcke"],
+      ].map(([to, label]) => (
+        <Link key={to} className={to === active ? "active" : ""} to={to}>
+          {label}
+        </Link>
+      ))}
+    </div>
+  );
+}
 export function Progress() {
   const { data } = useApp(),
     [params] = useSearchParams(),
@@ -75,12 +91,7 @@ export function Progress() {
           <Plus />
         </button>
       </Header>
-      <div className="segmented wide">
-        <Link className="active" to="/progress">
-          Lifts
-        </Link>
-        <Link to="/skills">Skills</Link>
-      </div>
+      <Tabs active="/progress" />
       <Link className="ai-link" to="/ai?kind=data_qa">
         <Sparkles size={20} />
         <span>
@@ -403,6 +414,86 @@ export function Progress() {
     </>
   );
 }
+// Repeated workout blocks: the same EMOM, AMRAP or For Time over time.
+export function BlockProgress() {
+  const { data } = useApp(),
+    [openKey, setOpenKey] = useState<string>(),
+    groups = repeatedBlocks(data),
+    group = groups.find((g) => g.key === openKey),
+    exercise = (id: string) => data.exercises.find((e) => e.id === id),
+    names = (ids: string[]) =>
+      ids.map((id) => exercise(id)?.name ?? "Unbekannte Übung").join(", ");
+  return (
+    <>
+      <Header title="Fortschritt" />
+      <Tabs active="/progress/blocks" />
+      {groups.length ? (
+        groups.map((g) => (
+          <button
+            key={g.key}
+            className="card lift-row"
+            onClick={() => setOpenKey(g.key)}
+          >
+            <div>
+              <strong>{g.title}</strong>
+              <small>{names(g.exerciseIds)}</small>
+              {g.details && <small>{g.details}</small>}
+            </div>
+            <div>
+              <strong className="lime block-score">
+                {scoreText(g.entries[0].block)}
+              </strong>
+              <small>
+                {g.entries.length}× · {formatDate(g.entries[0].session.date)}
+              </small>
+            </div>
+          </button>
+        ))
+      ) : (
+        <Empty title="Noch keine Blöcke">
+          <p>
+            Schliesse ein Training mit einem EMOM, AMRAP oder For Time und
+            eingetragenem Resultat ab. Gleiche Blöcke erscheinen hier zusammen,
+            damit du sie über die Zeit vergleichen kannst.
+          </p>
+        </Empty>
+      )}
+      {group && (
+        <Modal title={group.title} onClose={() => setOpenKey(undefined)}>
+          <p className="muted">
+            {[names(group.exerciseIds), group.details]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+          {group.entries.map(({ block, session, movements }) => (
+            <Link
+              className="row history-set"
+              key={block.id}
+              to={"/history/" + session.id}
+            >
+              <div>
+                <span>{formatDate(session.date)}</span>
+                {movements.map((m) => {
+                  const e = exercise(m.exerciseId);
+                  return (
+                    <small key={m.id}>
+                      {movements.length > 1
+                        ? `${e?.name ?? "Unbekannte Übung"}: `
+                        : ""}
+                      {e ? movementText(m, e.type) : ""}
+                    </small>
+                  );
+                })}
+                {block.note && <small>{block.note}</small>}
+              </div>
+              <strong className="lime">{scoreText(block)}</strong>
+            </Link>
+          ))}
+        </Modal>
+      )}
+    </>
+  );
+}
 export function Skills() {
   const { data } = useApp(),
     [selected, setSelected] = useState(""),
@@ -442,12 +533,7 @@ export function Skills() {
           <Plus />
         </button>
       </Header>
-      <div className="segmented wide">
-        <Link to="/progress">Lifts</Link>
-        <Link className="active" to="/skills">
-          Skills
-        </Link>
-      </div>
+      <Tabs active="/skills" />
       <div className="chips">
         {data.skills.map((s) => (
           <button

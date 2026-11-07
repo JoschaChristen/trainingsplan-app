@@ -24,7 +24,7 @@ import { Overview, History, SessionDetail } from "./overview";
 import { ExerciseLibrary, ExerciseEditor } from "./exercises";
 import { Training } from "./training-page";
 import { Cycles, CycleEditor } from "./cycles-page";
-import { Progress, Skills } from "./progress-page";
+import { BlockProgress, Progress, Skills } from "./progress-page";
 import { SettingsPage } from "./settings-page";
 import { AiPage, finishOAuth } from "./ai";
 function Shell() {
@@ -105,6 +105,7 @@ function Shell() {
             <Route path="/cycles" element={<Cycles />} />
             <Route path="/cycles/:id" element={<CycleEditor />} />
             <Route path="/progress" element={<Progress />} />
+            <Route path="/progress/blocks" element={<BlockProgress />} />
             <Route path="/skills" element={<Skills />} />
             <Route path="/exercises" element={<ExerciseLibrary />} />
             <Route path="/exercises/new" element={<ExerciseEditor />} />
