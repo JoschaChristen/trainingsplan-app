@@ -15,6 +15,7 @@ export class TrainingDB extends Dexie {
   stages!: Table<Data["stages"][number], string>;
   aiRuns!: Table<Data["aiRuns"][number], string>;
   settings!: Table<Settings, string>;
+  blocks!: Table<Data["blocks"][number], string>;
   constructor(name = "TrainingsplanV2") {
     super(name);
     this.version(1).stores({
@@ -32,6 +33,8 @@ export class TrainingDB extends Dexie {
       aiRuns: "id,kind,createdAt",
       settings: "id",
     });
+    // Additive: workout blocks (EMOM, AMRAP, For Time).
+    this.version(2).stores({ blocks: "id,sessionId" });
   }
 }
 export const db = new TrainingDB();

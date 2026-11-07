@@ -29,6 +29,8 @@ import {
   deleteSession,
   swapExercise,
 } from "./training";
+import { addBlock, addMovement } from "./blocks";
+import { BlockCard, NewBlockSheet } from "./block-card";
 import { personalRecords, volume, platesFor } from "./calculations";
 export function Training() {
   const { id } = useParams(),
@@ -39,6 +41,8 @@ export function Training() {
     nav = useNavigate();
   const [picker, setPicker] = useState(false),
     [swap, setSwap] = useState<string>(),
+    [pickBlock, setPickBlock] = useState<string>(),
+    [newBlock, setNewBlock] = useState(false),
     [expanded, setExpanded] = useState<string>(),
     [deleted, setDeleted] = useState<SetLog>(),
     [plateWeight, setPlateWeight] = useState<number>(),
@@ -64,10 +68,26 @@ export function Training() {
   const entries = data.sessionExercises
       .filter((e) => e.sessionId === id)
       .sort((a, b) => a.order - b.order),
+    standalone = entries.filter((e) => !e.blockId),
+    blocks = data.blocks.filter((b) => b.sessionId === id),
+    items = [
+      ...standalone.map((se) => ({
+        id: se.id,
+        order: se.order,
+        se,
+        block: undefined,
+      })),
+      ...blocks.map((block) => ({
+        id: block.id,
+        order: block.order,
+        se: undefined,
+        block,
+      })),
+    ].sort((a, b) => a.order - b.order),
     allSets = data.sets.filter((s) =>
       entries.some((e) => e.id === s.sessionExerciseId),
     ),
-    records = entries.flatMap((se) => {
+    records = standalone.flatMap((se) => {
       const e = data.exercises.find((e) => e.id === se.exerciseId)!;
       return personalRecords(
         allSets.filter((s) => s.exerciseId === e.id),
@@ -117,23 +137,43 @@ export function Training() {
             : "Pause"}
         </button>
       </Header>
-      {!entries.length && (
+      {!items.length && (
         <Empty title="Was steht heute an?">
           <p>
-            Wähle die erste Übung. Dein Training wird automatisch gespeichert.
+            Wähle die erste Übung oder einen Block für EMOM, AMRAP und For Time.
+            Dein Training wird automatisch gespeichert.
           </p>
         </Empty>
       )}
-      {entries.map((se, index) => {
-        const e = data.exercises.find((e) => e.id === se.exerciseId)!,
+      {items.map((item, index) => {
+        const isOpen = (expanded ?? items[0]?.id) === item.id;
+        if (item.block)
+          return (
+            <BlockCard
+              key={item.id}
+              block={item.block}
+              index={index}
+              open={isOpen}
+              data={data}
+              onToggle={() => setExpanded(isOpen ? "" : item.id)}
+              onAddMovement={() => {
+                setSwap(undefined);
+                setPickBlock(item.id);
+                setPicker(true);
+              }}
+            />
+          );
+        const se = item.se!,
+          e = data.exercises.find((e) => e.id === se.exerciseId)!,
           sets = allSets
             .filter((s) => s.sessionExerciseId === se.id)
             .sort((a, b) => a.order - b.order),
-          isOpen = (expanded ?? entries[0]?.id) === se.id,
           weight = ["weight_reps", "bodyweight_load"].includes(e.type),
           hold = e.type === "hold";
         const prevSe = data.sessionExercises
-            .filter((x) => x.exerciseId === e.id && x.sessionId !== id)
+            .filter(
+              (x) => x.exerciseId === e.id && x.sessionId !== id && !x.blockId,
+            )
             .sort((a, b) =>
               (
                 data.sessions.find((s) => s.id === b.sessionId)?.date ?? ""
@@ -382,10 +422,20 @@ export function Training() {
         className="outline dashed"
         onClick={() => {
           setSwap(undefined);
+          setPickBlock(undefined);
           setPicker(true);
         }}
       >
         <Plus size={19} /> Übung hinzufügen
+      </button>
+      <button
+        className="outline dashed stacked"
+        onClick={() => setNewBlock(true)}
+      >
+        <span>
+          <Plus size={19} /> Block hinzufügen
+        </span>
+        <small>EMOM · AMRAP · For Time</small>
       </button>
       <button
         className="text-button discard"
@@ -427,9 +477,25 @@ export function Training() {
           onClose={() => setPicker(false)}
           onPick={(e) =>
             void run(async () => {
-              if (swap) setExpanded(await swapExercise(swap, e.id, data));
+              if (pickBlock) await addMovement(pickBlock, e.id, data);
+              else if (swap) setExpanded(await swapExercise(swap, e.id, data));
               else setExpanded(await addExercise(session.id, e.id, data));
               setPicker(false);
+            })
+          }
+        />
+      )}
+      {newBlock && (
+        <NewBlockSheet
+          onClose={() => setNewBlock(false)}
+          onCreate={(format, params) =>
+            void run(async () => {
+              const blockId = await addBlock(session.id, format, params);
+              setExpanded(blockId);
+              setNewBlock(false);
+              setSwap(undefined);
+              setPickBlock(blockId);
+              setPicker(true);
             })
           }
         />

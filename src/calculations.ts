@@ -34,8 +34,9 @@ export function series(exercise: Exercise, d: Data) {
     !["weight_reps", "bodyweight_load"].includes(exercise.type)
   )
     return [];
+  // Sets from workout blocks are done under fatigue: no 1RM estimate.
   const result = d.sessionExercises
-    .filter((x) => x.exerciseId === exercise.id)
+    .filter((x) => x.exerciseId === exercise.id && !x.blockId)
     .flatMap((se) => {
       const session = d.sessions.find((s) => s.id === se.sessionId);
       if (!session) return [];
@@ -131,8 +132,8 @@ export function personalRecords(
   e: Exercise,
   formula: Settings["oneRmFormula"],
 ) {
-  const done = current.filter((s) => s.done && !s.isWarmup),
-    old = previous.filter((s) => s.done && !s.isWarmup),
+  const done = current.filter((s) => s.done && !s.isWarmup && !s.blockId),
+    old = previous.filter((s) => s.done && !s.isWarmup && !s.blockId),
     out: string[] = [];
   if (!done.length) return out;
   const best = (ss: SetLog[], field: "seconds" | "reps") =>

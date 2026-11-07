@@ -4,6 +4,7 @@ import {
   dump,
   importLegacyFixture,
   open,
+  sheet,
   startFreeSessionWith,
   watchErrors,
 } from "./helpers";
@@ -81,6 +82,23 @@ for (const width of [360, 390, 430]) {
       await addExercise(page, "L-Sit");
       await addExercise(page, "Klimmzug mit Zusatzgewicht");
       await expectClean(page, null);
+      // A workout block with two movements, then its full-screen timer.
+      await page.getByRole("button", { name: /Block hinzufügen/ }).click();
+      await sheet(page).getByRole("button", { name: "Block anlegen" }).click();
+      await sheet(page).getByLabel("Übungen suchen").fill("Klimmzug");
+      await sheet(page)
+        .getByRole("button", { name: /^Klimmzug/ })
+        .click();
+      await page.getByRole("button", { name: "Übung in den Block" }).click();
+      await sheet(page).getByLabel("Übungen suchen").fill("L-Sit");
+      await sheet(page)
+        .getByRole("button", { name: /^L-Sit/ })
+        .click();
+      await expect(sheet(page)).toHaveCount(0);
+      await expectClean(page, null);
+      await page.getByRole("button", { name: "Timer starten" }).click();
+      await expectClean(page, null);
+      await page.getByRole("button", { name: "Timer schliessen" }).click();
       expect(errors).toEqual([]);
     });
   });

@@ -278,6 +278,7 @@ export function Progress() {
                 s.exerciseId === detail.id &&
                 s.done &&
                 !s.isWarmup &&
+                !s.blockId &&
                 s.reps === reps &&
                 s.weight !== undefined,
             );
@@ -414,7 +415,11 @@ export function Skills() {
       .sort((a, b) => a.order - b.order),
     stage = stages[skill?.currentStage ?? 0],
     logs = data.sets.filter(
-      (s) => s.exerciseId === stage?.exerciseId && s.done && !s.isWarmup,
+      (s) =>
+        s.exerciseId === stage?.exerciseId &&
+        s.done &&
+        !s.isWarmup &&
+        !s.blockId,
     ),
     value = (s: (typeof logs)[number]) =>
       stage?.criterion.kind === "hold_seconds"
