@@ -54,6 +54,12 @@ export const sessionExerciseSchema = z.object({
   plannedEntryId: id.optional(),
   rpeLastSet: z.number().min(6).max(10).optional(),
   note: text.optional(),
+  // Movement of a workout block: the work per round. Its sets are derived
+  // from these targets and the block result (see blocks.ts).
+  blockId: id.optional(),
+  targetWeight: n.max(2000).optional(),
+  targetReps: integer.max(10000).optional(),
+  targetSeconds: n.max(86400).optional(),
 });
 export const setSchema = z.object({
   id,
@@ -66,6 +72,27 @@ export const setSchema = z.object({
   reps: integer.max(10000).optional(),
   seconds: n.max(86400).optional(),
   done: z.boolean(),
+  // Set derived from a workout block; excluded from 1RM, records and skills.
+  blockId: id.optional(),
+});
+export const blockFormats = ["emom", "amrap", "for_time"] as const;
+export const blockSchema = z.object({
+  id,
+  sessionId: id,
+  order: integer,
+  format: z.enum(blockFormats),
+  // EMOM and AMRAP: duration; For Time: optional time cap.
+  minutes: integer.min(1).max(600).optional(),
+  intervalSeconds: integer.min(10).max(3600).optional(),
+  // EMOM: movements take turns, one per interval.
+  alternate: z.boolean().optional(),
+  rounds: integer.min(1).max(1000).optional(),
+  // EMOM: intervals done; AMRAP and capped For Time: full rounds and extra reps.
+  scoreRounds: integer.max(10000).optional(),
+  scoreReps: integer.max(100000).optional(),
+  scoreSeconds: n.max(86400).optional(),
+  capped: z.boolean().optional(),
+  note: text.optional(),
 });
 export const rmSchema = z.object({
   id,
@@ -173,6 +200,7 @@ export type Skill = z.infer<typeof skillSchema>;
 export type SkillStage = z.infer<typeof stageSchema>;
 export type AiRun = z.infer<typeof aiRunSchema>;
 export type Settings = z.infer<typeof settingsSchema>;
+export type Block = z.infer<typeof blockSchema>;
 export const dataSchema = z.object({
   exercises: z.array(exerciseSchema),
   sessions: z.array(sessionSchema),
@@ -187,6 +215,8 @@ export const dataSchema = z.object({
   stages: z.array(stageSchema),
   aiRuns: z.array(aiRunSchema),
   settings: z.array(settingsSchema).max(1),
+  // Added after the first release: older backups have no blocks.
+  blocks: z.array(blockSchema).default([]),
 });
 export type Data = z.infer<typeof dataSchema>;
 export const defaults: Settings = {
@@ -219,6 +249,7 @@ export const emptyData = (): Data => ({
   stages: [],
   aiRuns: [],
   settings: [],
+  blocks: [],
 });
 export const dateAdd = (d: string, days: number) =>
   new Date(Date.parse(d + "T12:00:00Z") + days * 86400000)

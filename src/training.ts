@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { type Data, type SetLog, uid, today } from "./model";
 import { loadKg } from "./calculations";
+import { nextOrder } from "./blocks";
 export async function addExercise(
   sessionId: string,
   exerciseId: string,
@@ -19,7 +20,9 @@ export async function addExercise(
       `Für ${e.name} fehlt ein aktueller 1RM. Trage ihn unter Fortschritt ein oder plane kg.`,
     );
   const previousSe = d.sessionExercises
-    .filter((x) => x.exerciseId === e.id && x.sessionId !== sessionId)
+    .filter(
+      (x) => x.exerciseId === e.id && x.sessionId !== sessionId && !x.blockId,
+    )
     .sort((a, b) =>
       (d.sessions.find((s) => s.id === b.sessionId)?.date ?? "").localeCompare(
         d.sessions.find((s) => s.id === a.sessionId)?.date ?? "",
@@ -30,41 +33,46 @@ export async function addExercise(
     .sort((a, b) => a.order - b.order);
   const count = cell?.sets ?? (previous.length || 3),
     seId = uid();
-  await db.transaction("rw", db.sessionExercises, db.sets, async () => {
-    const order = await db.sessionExercises
-      .where("sessionId")
-      .equals(sessionId)
-      .count();
-    await db.sessionExercises.add({
-      id: seId,
-      sessionId,
-      exerciseId,
-      order,
-      status: "planned",
-      plannedEntryId: entryId,
-    });
-    const rows: SetLog[] = Array.from({ length: count }, (_, i) => ({
-      id: uid(),
-      sessionExerciseId: seId,
-      exerciseId,
-      date: session.date,
-      order: i,
-      isWarmup: false,
-      done: false,
-      weight: ["weight_reps", "bodyweight_load"].includes(e.type)
-        ? cell
-          ? loadKg(cell, e, d)
-          : previous[i]?.weight
-        : undefined,
-      reps:
-        e.type !== "hold" ? (cell?.reps ?? previous[i]?.reps ?? 5) : undefined,
-      seconds:
-        e.type === "hold"
-          ? (cell?.seconds ?? previous[i]?.seconds ?? 30)
+  await db.transaction(
+    "rw",
+    db.sessionExercises,
+    db.sets,
+    db.blocks,
+    async () => {
+      const order = await nextOrder(sessionId);
+      await db.sessionExercises.add({
+        id: seId,
+        sessionId,
+        exerciseId,
+        order,
+        status: "planned",
+        plannedEntryId: entryId,
+      });
+      const rows: SetLog[] = Array.from({ length: count }, (_, i) => ({
+        id: uid(),
+        sessionExerciseId: seId,
+        exerciseId,
+        date: session.date,
+        order: i,
+        isWarmup: false,
+        done: false,
+        weight: ["weight_reps", "bodyweight_load"].includes(e.type)
+          ? cell
+            ? loadKg(cell, e, d)
+            : previous[i]?.weight
           : undefined,
-    }));
-    await db.sets.bulkAdd(rows);
-  });
+        reps:
+          e.type !== "hold"
+            ? (cell?.reps ?? previous[i]?.reps ?? 5)
+            : undefined,
+        seconds:
+          e.type === "hold"
+            ? (cell?.seconds ?? previous[i]?.seconds ?? 30)
+            : undefined,
+      }));
+      await db.sets.bulkAdd(rows);
+    },
+  );
   return seId;
 }
 export async function swapExercise(
@@ -74,9 +82,7 @@ export async function swapExercise(
 ) {
   return db.transaction(
     "rw",
-    db.sessions,
-    db.sessionExercises,
-    db.sets,
+    [db.sessions, db.sessionExercises, db.sets, db.blocks],
     async () => {
       const se = await db.sessionExercises.get(sessionExerciseId);
       if (!se) throw Error("Übung nicht gefunden.");
@@ -107,9 +113,7 @@ export async function startSession(d: Data, dayId?: string, week?: number) {
     id = uid();
   await db.transaction(
     "rw",
-    db.sessions,
-    db.sessionExercises,
-    db.sets,
+    [db.sessions, db.sessionExercises, db.sets, db.blocks],
     async () => {
       await db.sessions.add({
         id,
@@ -168,15 +172,14 @@ export async function appendSet(seId: string, warmup = false) {
     },
   );
 }
-// Deletes a session with its exercises and sets. Estimated 1RMs, records and
+// Deletes a session with its exercises, blocks and sets. Estimated 1RMs, records and
 // volume are derived from sets, so they follow automatically.
 export async function deleteSession(sessionId: string) {
   await db.transaction(
     "rw",
-    db.sessions,
-    db.sessionExercises,
-    db.sets,
+    [db.sessions, db.sessionExercises, db.sets, db.blocks],
     async () => {
+      await db.blocks.where("sessionId").equals(sessionId).delete();
       const ids = (
         await db.sessionExercises.where("sessionId").equals(sessionId).toArray()
       ).map((e) => e.id);

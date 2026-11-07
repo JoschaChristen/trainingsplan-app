@@ -20,6 +20,7 @@ import {
 } from "./model";
 import { currentRm, series, volume, loadKg } from "./calculations";
 import { deleteSession, startSession } from "./training";
+import { BlockSummary } from "./block-card";
 export function cycleWeek(c: Cycle) {
   return Math.max(
     1,
@@ -428,38 +429,57 @@ export function SessionDetail() {
       {s.dateIsApproximate && (
         <p className="muted">Das Datum wurde aus der alten App abgeleitet.</p>
       )}
-      {entries.map((se) => (
-        <Card key={se.id}>
-          <h2>{data.exercises.find((e) => e.id === se.exerciseId)?.name}</h2>
-          {se.status === "skipped" ? (
-            <p>Ausgelassen</p>
+      {[
+        ...entries
+          .filter((se) => !se.blockId)
+          .map((se) => ({ order: se.order, se, block: undefined })),
+        ...data.blocks
+          .filter((b) => b.sessionId === s.id)
+          .map((block) => ({ order: block.order, se: undefined, block })),
+      ]
+        .sort((a, b) => a.order - b.order)
+        .map(({ se, block }) =>
+          block ? (
+            <BlockSummary key={block.id} block={block} data={data} />
           ) : (
-            data.sets
-              .filter((x) => x.sessionExerciseId === se.id)
-              .sort((a, b) => a.order - b.order)
-              .map((x, i) => (
-                <div className="row history-set" key={x.id}>
-                  <small>{x.isWarmup ? "W" : i + 1}</small>
-                  <span>
-                    {x.seconds !== undefined
-                      ? `${fmt(x.seconds)} s`
-                      : [
-                          x.weight !== undefined ? `${fmt(x.weight)} kg` : null,
-                          x.reps !== undefined ? `${x.reps} Wdh` : null,
-                        ]
-                          .filter(Boolean)
-                          .join(" × ")}
-                  </span>
-                  <span className={x.done ? "lime" : "muted"}>
-                    {x.done ? "✓" : "offen"}
-                  </span>
-                </div>
-              ))
-          )}
-          {se.rpeLastSet && <small>RPE letzter Satz: {se.rpeLastSet}</small>}
-          {se.note && <p>{se.note}</p>}
-        </Card>
-      ))}
+            <Card key={se!.id}>
+              <h2>
+                {data.exercises.find((e) => e.id === se!.exerciseId)?.name}
+              </h2>
+              {se!.status === "skipped" ? (
+                <p>Ausgelassen</p>
+              ) : (
+                data.sets
+                  .filter((x) => x.sessionExerciseId === se!.id)
+                  .sort((a, b) => a.order - b.order)
+                  .map((x, i) => (
+                    <div className="row history-set" key={x.id}>
+                      <small>{x.isWarmup ? "W" : i + 1}</small>
+                      <span>
+                        {x.seconds !== undefined
+                          ? `${fmt(x.seconds)} s`
+                          : [
+                              x.weight !== undefined
+                                ? `${fmt(x.weight)} kg`
+                                : null,
+                              x.reps !== undefined ? `${x.reps} Wdh` : null,
+                            ]
+                              .filter(Boolean)
+                              .join(" × ")}
+                      </span>
+                      <span className={x.done ? "lime" : "muted"}>
+                        {x.done ? "✓" : "offen"}
+                      </span>
+                    </div>
+                  ))
+              )}
+              {se!.rpeLastSet && (
+                <small>RPE letzter Satz: {se!.rpeLastSet}</small>
+              )}
+              {se!.note && <p>{se!.note}</p>}
+            </Card>
+          ),
+        )}
       {s.note && (
         <Card>
           <p>{s.note}</p>

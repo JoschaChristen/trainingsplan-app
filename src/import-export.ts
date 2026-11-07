@@ -322,13 +322,26 @@ export function validateRelations(d: Data) {
     need = (ok: boolean) => {
       if (!ok) throw Error("Die Datei enthält ungültige Verknüpfungen.");
     };
+  d.blocks.forEach((x) => need(has("sessions", x.sessionId)));
   d.sessionExercises.forEach((x) =>
-    need(has("sessions", x.sessionId) && has("exercises", x.exerciseId)),
+    need(
+      has("sessions", x.sessionId) &&
+        has("exercises", x.exerciseId) &&
+        (!x.blockId ||
+          d.blocks.some(
+            (b) => b.id === x.blockId && b.sessionId === x.sessionId,
+          )),
+    ),
   );
   d.sets.forEach((x) => {
     const se = d.sessionExercises.find((s) => s.id === x.sessionExerciseId);
     const sess = d.sessions.find((s) => s.id === se?.sessionId);
-    need(!!se && se.exerciseId === x.exerciseId && sess?.date === x.date);
+    need(
+      !!se &&
+        se.exerciseId === x.exerciseId &&
+        sess?.date === x.date &&
+        se.blockId === x.blockId,
+    );
   });
   if (
     new Set(d.cells.map((c) => c.entryId + "|" + c.week)).size !==

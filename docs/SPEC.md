@@ -74,6 +74,26 @@ interface SessionExercise {     // an exercise within a session, ordered
   plannedEntryId?: string;      // CycleEntry this came from
   rpeLastSet?: number;          // 6–10, optional (only the last work set is rated)
   note?: string;
+  blockId?: string;             // movement of a workout block (see Block)
+  targetWeight?: number;        // block movement: work per round
+  targetReps?: number;
+  targetSeconds?: number;
+}
+
+interface Block {               // workout block in a session (schema version 2)
+  id: string;
+  sessionId: string;
+  order: number;                // shares the order with standalone exercises
+  format: 'emom' | 'amrap' | 'for_time';
+  minutes?: number;             // EMOM/AMRAP duration, For Time cap
+  intervalSeconds?: number;     // EMOM interval (60 = EMOM, 120 = E2MOM)
+  alternate?: boolean;          // EMOM: one movement per interval, in turns
+  rounds?: number;              // For Time rounds
+  scoreRounds?: number;         // EMOM: intervals done; AMRAP/capped: full rounds
+  scoreReps?: number;           // AMRAP/capped: reps of the unfinished round
+  scoreSeconds?: number;        // For Time result
+  capped?: boolean;             // For Time hit the cap
+  note?: string;
 }
 
 interface SetLog {
@@ -87,6 +107,7 @@ interface SetLog {
   reps?: number;
   seconds?: number;             // for hold
   done: boolean;
+  blockId?: string;             // derived from a block; see "Workout blocks"
 }
 
 interface OneRmRecord {         // only for TESTED maxes; estimates are derived
@@ -205,6 +226,14 @@ the 6 weeks before, flag "Plateau". Only flagged lifts get the "KI-Analyse" butt
 
 **Week volume:** sum of weight × reps of done work sets, per exercise and per category.
 
+**Workout blocks:** the sets of a block movement are derived from its targets and the
+block result (`src/blocks.ts`, rewritten on every change): EMOM = one set per interval
+(alternating: intervals split in turns), done = intervals done; AMRAP = one set per full
+round plus a partial set for the extra reps, spread over the movements in order (holds
+in the unfinished round are not counted); For Time = one set per round, all done once a
+time is entered, or rounds + reps when the cap was hit. Block sets count for volume but
+never for e1RM, records, best sets or skill progress (done under fatigue).
+
 ---
 
 ## 4. Screens
@@ -240,6 +269,12 @@ Visual reference: `docs/design/` (read its README first).
 - "Übung hinzufügen oder tauschen" (search library, or create new inline).
 - Sticky bottom: "Einheit abschliessen" → summary (PRs, volume) → save.
 - **Autosave** every change immediately (a crash or reload must not lose sets).
+- "Block hinzufügen" (EMOM, AMRAP, For Time): parameters, movements with work per
+  round, result fields, note. "Timer starten" opens a full-screen timer: 10 s countdown,
+  beeps and vibration 3-2-1 and at every interval, EMOM interval and current movement,
+  AMRAP remaining time with a round counter, For Time stopwatch with "Fertig". The
+  screen stays on (Wake Lock); the state survives a reload. At the end "Übernehmen"
+  writes the result into the block (an explicit tap).
 - "Training verwerfen" below the exercises deletes the running session after a
   confirmation. A finished session is deleted from its detail view (trash icon in the
   header, confirmation). Deleting removes the session, its exercises and sets; e1RM,
