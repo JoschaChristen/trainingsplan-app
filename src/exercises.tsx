@@ -33,7 +33,7 @@ export function ExerciseLibrary() {
   );
   return (
     <>
-      <Header title="Übungen" sub="Deine Bibliothek">
+      <Header title="Übungen">
         <Link className="icon" to="/exercises/new" aria-label="Neue Übung">
           <Plus />
         </Link>

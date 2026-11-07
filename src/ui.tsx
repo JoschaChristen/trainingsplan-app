@@ -50,15 +50,18 @@ export function Header({
   title,
   sub,
   back,
+  leading,
   children,
 }: {
   title: string;
   sub?: string;
   back?: string;
+  leading?: ReactNode;
   children?: ReactNode;
 }) {
   return (
     <header className="page-header">
+      {leading}
       <div>
         {back && (
           <Link className="back" to={back}>
@@ -90,9 +93,6 @@ export function Empty({
 }) {
   return (
     <Card className="empty">
-      <span className="empty-mark">
-        <Plus />
-      </span>
       <h2>{title}</h2>
       {children}
     </Card>

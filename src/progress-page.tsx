@@ -66,7 +66,7 @@ export function Progress() {
     y = (v: number) => 175 - (v / ymax) * 145;
   return (
     <>
-      <Header title="Fortschritt" sub="Deine Arbeit wird sichtbar">
+      <Header title="Fortschritt">
         <button
           className="icon"
           onClick={() => setAdd(true)}
@@ -428,7 +428,7 @@ export function Skills() {
       best >= target;
   return (
     <>
-      <Header title="Deine Skills" sub="Schritt für Schritt stärker">
+      <Header title="Deine Skills">
         <button
           className="icon"
           aria-label="Neuer Skill"

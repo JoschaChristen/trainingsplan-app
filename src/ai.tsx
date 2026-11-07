@@ -510,7 +510,7 @@ export function AiPage() {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
   return (
     <>
-      <Header title="Dein Assistent" sub="Du entscheidest. Immer." back="/" />
+      <Header title="Dein Assistent" back="/" />
       <div className="chips">
         {aiKinds.map((k) => (
           <button

@@ -10,7 +10,7 @@ import {
   Repeat2,
 } from "lucide-react";
 import { db } from "./db";
-import { type SetLog, fmt } from "./model";
+import { type SetLog, fmt, formatDate } from "./model";
 import {
   Header,
   Card,
@@ -23,7 +23,12 @@ import {
   useNotice,
   useAction,
 } from "./ui";
-import { addExercise, appendSet, swapExercise } from "./training";
+import {
+  addExercise,
+  appendSet,
+  deleteSession,
+  swapExercise,
+} from "./training";
 import { personalRecords, volume, platesFor } from "./calculations";
 export function Training() {
   const { id } = useParams(),
@@ -38,6 +43,7 @@ export function Training() {
     [deleted, setDeleted] = useState<SetLog>(),
     [plateWeight, setPlateWeight] = useState<number>(),
     [finishing, setFinishing] = useState(false),
+    [discarding, setDiscarding] = useState(false),
     [deadline, setDeadline] = useState(() =>
       Number(sessionStorage.getItem("training-rest") || 0),
     ),
@@ -89,7 +95,16 @@ export function Training() {
     <>
       <Header
         title={session.title ?? "Training"}
-        sub={session.week ? `Woche ${session.week}` : "Freies Training"}
+        sub={session.week ? `Woche ${session.week}` : undefined}
+        leading={
+          <Link
+            className="icon back-icon"
+            to="/training"
+            aria-label="Zurück zur Trainingsübersicht"
+          >
+            <ArrowLeft />
+          </Link>
+        }
       >
         <button
           className={"timer " + (seconds ? "running" : "")}
@@ -102,9 +117,6 @@ export function Training() {
             : "Pause"}
         </button>
       </Header>
-      <Link className="back" to="/training">
-        <ArrowLeft size={18} /> Gespeichert · später fortsetzen
-      </Link>
       {!entries.length && (
         <Empty title="Was steht heute an?">
           <p>
@@ -375,6 +387,12 @@ export function Training() {
       >
         <Plus size={19} /> Übung hinzufügen
       </button>
+      <button
+        className="text-button discard"
+        onClick={() => setDiscarding(true)}
+      >
+        <Trash2 size={16} /> Training verwerfen
+      </button>
       <div className="finish-bar">
         <span>
           {allSets.filter((s) => s.done && !s.isWarmup).length} Sätze ·{" "}
@@ -471,6 +489,33 @@ export function Training() {
               ? "Exakt beladbar."
               : `${fmt(platesFor(plateWeight, settings.barWeight, settings.plates).remainder)} kg nicht beladbar.`}
           </p>
+        </Modal>
+      )}
+      {discarding && (
+        <Modal title="Training verwerfen?" onClose={() => setDiscarding(false)}>
+          <p>
+            Das Training vom {formatDate(session.date)} mit {entries.length}{" "}
+            {entries.length === 1 ? "Übung" : "Übungen"} und {allSets.length}{" "}
+            {allSets.length === 1 ? "Satz" : "Sätzen"} wird gelöscht. Das lässt
+            sich nicht rückgängig machen.
+          </p>
+          <button
+            className="primary danger"
+            disabled={busy}
+            onClick={() =>
+              void run(async () => {
+                await deleteSession(session.id);
+                setDeadline(0);
+                sessionStorage.removeItem("training-rest");
+                nav("/training");
+              })
+            }
+          >
+            <Trash2 size={18} /> Training löschen
+          </button>
+          <button className="outline" onClick={() => setDiscarding(false)}>
+            Abbrechen
+          </button>
         </Modal>
       )}
       {finishing && (

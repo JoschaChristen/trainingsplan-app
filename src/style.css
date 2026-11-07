@@ -117,8 +117,13 @@ strong {
   gap: 10px;
   margin-bottom: 6px;
 }
-.page-header > div:first-child {
+.page-header > div:not(.actions) {
   min-width: 0;
+  flex: 1;
+}
+.page-header > .back-icon {
+  flex: none;
+  align-self: center;
 }
 .eyebrow {
   display: block;
@@ -413,35 +418,14 @@ strong {
 .ai-link small {
   margin-top: 3px;
 }
-.backup-hint {
-  display: block;
-  min-height: 44px;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.6;
-  padding: 6px 2px;
-}
-.backup-hint span {
-  color: var(--baby);
-}
 .empty {
   text-align: center;
   align-items: center;
-  padding: 30px 22px;
+  padding: 28px 22px;
+  gap: 10px;
 }
 .empty p {
   color: var(--muted);
-}
-.empty-mark {
-  display: flex;
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface2);
-  color: var(--baby);
-  margin-bottom: 3px;
 }
 .field {
   display: flex;
@@ -1155,4 +1139,30 @@ ul {
     min-width: 44px;
     height: 44px;
   }
+}
+.primary.danger {
+  background: #f2bb9b;
+}
+.discard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  align-self: center;
+  min-height: 44px;
+  padding: 6px 12px;
+  color: var(--muted);
+}
+.discard:hover {
+  color: #f2bb9b;
+}
+.plan-link {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+}
+.plan-link strong {
+  flex: 1;
+  font-size: 17px;
 }

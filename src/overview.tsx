@@ -5,9 +5,11 @@ import {
   Play,
   ArrowUpRight,
   ChevronRight,
-  Dumbbell,
+  CalendarDays,
+  Trash2,
 } from "lucide-react";
-import { Header, Card, Empty, useApp, useAction } from "./ui";
+import { useState } from "react";
+import { Header, Card, Empty, Modal, useApp, useAction } from "./ui";
 import {
   today,
   dateAdd,
@@ -17,7 +19,7 @@ import {
   type Cycle,
 } from "./model";
 import { currentRm, series, volume, loadKg } from "./calculations";
-import { startSession } from "./training";
+import { deleteSession, startSession } from "./training";
 export function cycleWeek(c: Cycle) {
   return Math.max(
     1,
@@ -70,7 +72,7 @@ export function Sparkline({ values }: { values: number[] }) {
   );
 }
 export function Overview() {
-  const { data, settings } = useApp(),
+  const { data } = useApp(),
     nav = useNavigate(),
     { busy, run } = useAction(),
     active = data.cycles.find((c) => c.status === "active"),
@@ -104,9 +106,6 @@ export function Overview() {
         })
         .at(-1)
     : undefined;
-  const due =
-    !settings.lastBackupAt ||
-    Date.now() - Date.parse(settings.lastBackupAt) > 14 * 86400000;
   return (
     <>
       <Header
@@ -162,18 +161,11 @@ export function Overview() {
           </small>
         </Link>
       ) : (
-        <Card>
-          <div className="row">
-            <div>
-              <span className="eyebrow">Dein nächster Block</span>
-              <h2>Ein Plan, der mit dir wächst.</h2>
-            </div>
-            <Dumbbell className="baby" size={32} />
-          </div>
-          <Link to="/cycles" className="text-link">
-            Zyklus planen <ArrowUpRight size={16} />
-          </Link>
-        </Card>
+        <Link className="card plan-link" to="/cycles">
+          <CalendarDays className="baby" size={22} />
+          <strong>Zyklus planen</strong>
+          <ChevronRight />
+        </Link>
       )}
       <Card className="today-card">
         <div className="row">
@@ -307,14 +299,6 @@ export function Overview() {
           <ChevronRight />
         </Link>
       )}
-      {due && (
-        <Link className="backup-hint" to="/settings">
-          {settings.lastBackupAt
-            ? "Zeit für ein Backup."
-            : "Deine Daten bleiben auf diesem Gerät."}{" "}
-          <span>Jetzt sichern →</span>
-        </Link>
-      )}
     </>
   );
 }
@@ -325,7 +309,7 @@ export function History() {
     ongoing = data.sessions.find((s) => s.startedAt && !s.finishedAt);
   return (
     <>
-      <Header title="Training" sub="Jeder Satz zählt" />
+      <Header title="Training" />
       <button
         className="primary"
         disabled={busy}
@@ -390,18 +374,57 @@ export function History() {
 export function SessionDetail() {
   const { id } = useParams(),
     { data } = useApp(),
+    { busy, run } = useAction(),
+    nav = useNavigate(),
+    [deleting, setDeleting] = useState(false),
     s = data.sessions.find((s) => s.id === id);
   if (!s) return <Empty title="Einheit nicht gefunden" />;
   const entries = data.sessionExercises
-    .filter((e) => e.sessionId === id)
-    .sort((a, b) => a.order - b.order);
+      .filter((e) => e.sessionId === id)
+      .sort((a, b) => a.order - b.order),
+    setCount = data.sets.filter((x) =>
+      entries.some((e) => e.id === x.sessionExerciseId),
+    ).length;
   return (
     <>
       <Header
         title={s.title ?? "Training"}
         sub={formatDate(s.date)}
         back="/training"
-      />
+      >
+        <button
+          className="icon"
+          aria-label="Training löschen"
+          onClick={() => setDeleting(true)}
+        >
+          <Trash2 />
+        </button>
+      </Header>
+      {deleting && (
+        <Modal title="Training löschen?" onClose={() => setDeleting(false)}>
+          <p>
+            Das Training vom {formatDate(s.date)} mit {setCount}{" "}
+            {setCount === 1 ? "Satz" : "Sätzen"} wird gelöscht. Geschätzte 1RM,
+            Bestwerte und Volumen werden ohne dieses Training neu berechnet. Das
+            lässt sich nicht rückgängig machen.
+          </p>
+          <button
+            className="primary danger"
+            disabled={busy}
+            onClick={() =>
+              void run(async () => {
+                await deleteSession(s.id);
+                nav("/training");
+              })
+            }
+          >
+            <Trash2 size={18} /> Training löschen
+          </button>
+          <button className="outline" onClick={() => setDeleting(false)}>
+            Abbrechen
+          </button>
+        </Modal>
+      )}
       {s.dateIsApproximate && (
         <p className="muted">Das Datum wurde aus der alten App abgeleitet.</p>
       )}

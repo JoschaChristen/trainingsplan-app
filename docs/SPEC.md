@@ -222,7 +222,8 @@ Visual reference: `docs/design/` (read its README first).
 - Skill card for the most recently trained skill: stage n of N, progress to target, best value.
 
 ### 4.2 Training (live session)
-- Header: back, `Woche n · Tag X`, title, rest timer pill (starts automatically when a
+- Header: icon-only back button (left of the title, "Zurück zur Trainingsübersicht"),
+  `Woche n` above the title for planned sessions only, title, rest timer pill (starts automatically when a
   set is checked; default from settings; tap to adjust/skip; vibrate at 0 if supported).
 - One card per exercise; the active one expanded, others collapsed with `done/total`.
 - Set table columns depend on exercise type:
@@ -239,6 +240,10 @@ Visual reference: `docs/design/` (read its README first).
 - "Übung hinzufügen oder tauschen" (search library, or create new inline).
 - Sticky bottom: "Einheit abschliessen" → summary (PRs, volume) → save.
 - **Autosave** every change immediately (a crash or reload must not lose sets).
+- "Training verwerfen" below the exercises deletes the running session after a
+  confirmation. A finished session is deleted from its detail view (trash icon in the
+  header, confirmation). Deleting removes the session, its exercises and sets; e1RM,
+  records and volume are derived from sets and follow automatically.
 
 ### 4.3 Zyklen
 - List: active cycle on top, drafts, completed (with AI review card if available).

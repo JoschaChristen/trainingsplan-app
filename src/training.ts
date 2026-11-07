@@ -168,3 +168,21 @@ export async function appendSet(seId: string, warmup = false) {
     },
   );
 }
+// Deletes a session with its exercises and sets. Estimated 1RMs, records and
+// volume are derived from sets, so they follow automatically.
+export async function deleteSession(sessionId: string) {
+  await db.transaction(
+    "rw",
+    db.sessions,
+    db.sessionExercises,
+    db.sets,
+    async () => {
+      const ids = (
+        await db.sessionExercises.where("sessionId").equals(sessionId).toArray()
+      ).map((e) => e.id);
+      await db.sets.where("sessionExerciseId").anyOf(ids).delete();
+      await db.sessionExercises.bulkDelete(ids);
+      await db.sessions.delete(sessionId);
+    },
+  );
+}
