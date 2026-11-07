@@ -312,7 +312,17 @@ Visual reference: `docs/design/` (read its README first).
 - A stage is achieved automatically when a logged set of its linked exercise meets the
   criterion; the app then asks to advance (never silently).
 
-### 4.6 Übungen
+### 4.6 Fortschritt — Blöcke
+- Third tab next to Lifts and Skills (`#/progress/blocks`): repeated workout blocks.
+- Only blocks of finished sessions with a result. Blocks count as the same when format,
+  duration (EMOM, AMRAP) or rounds (For Time), EMOM interval and "abwechselnd" and the
+  set of exercises (order ignored) match (`repeatedBlocks` in `src/blocks.ts`). Work per
+  round and the For Time cap may differ: that is the progress to compare.
+- One card per group, most recent first: title, exercises, last result, count and date.
+  Tap → sheet with every entry (date, work per round per exercise, note, result), each
+  linking to the session.
+
+### 4.7 Übungen
 - Library list with search and category filter; custom badge; archive instead of delete
   when the exercise has logs.
 - New/edit exercise: name, type ("Wie wird erfasst?"), category, toggles (1RM berechnen
@@ -320,7 +330,7 @@ Visual reference: `docs/design/` (read its README first).
 - Seed library: a small set of common lifts and skills **in German**, plus everything
   that came from the legacy import.
 
-### 4.7 Einstellungen (from a gear icon on Übersicht)
+### 4.8 Einstellungen (from a gear icon on Übersicht)
 - 1RM formula, bar weight, plates, default rest time.
 - KI: connect OpenRouter (6.0), model choice, "KI-Funktionen aus" switch.
 - Daten: Export (JSON), Import (JSON backup or legacy export), last backup date,

@@ -148,6 +148,83 @@ export function movementText(
     : work;
 }
 
+// Repeated blocks: blocks of finished sessions that have a result, grouped by
+// what makes them the same workout (format, duration or rounds, EMOM interval
+// and turns, and the same exercises in any order). Work per round and the
+// For Time cap may differ between entries: that is the progress to compare.
+export type BlockEntry = {
+  block: Block;
+  session: Data["sessions"][number];
+  movements: SessionExercise[];
+};
+export type BlockGroup = {
+  key: string;
+  title: string;
+  details: string;
+  exerciseIds: string[];
+  entries: BlockEntry[];
+};
+
+export function blockKey(b: Block, exerciseIds: string[]) {
+  const shape =
+    b.format === "emom"
+      ? [
+          b.minutes,
+          b.intervalSeconds,
+          b.alternate && exerciseIds.length > 1 ? "alt" : "",
+        ]
+      : b.format === "amrap"
+        ? [b.minutes]
+        : [b.rounds ?? 1];
+  return [b.format, ...shape, ...[...exerciseIds].sort()].join("|");
+}
+
+export function repeatedBlocks(d: Data): BlockGroup[] {
+  const groups = new Map<string, BlockGroup>();
+  for (const b of d.blocks) {
+    const session = d.sessions.find((s) => s.id === b.sessionId);
+    if (!session?.finishedAt || !hasResult(b)) continue;
+    const movements = d.sessionExercises
+      .filter((x) => x.blockId === b.id)
+      .sort((a, c) => a.order - c.order);
+    if (!movements.length) continue;
+    const ids = movements.map((m) => m.exerciseId),
+      key = blockKey(b, ids),
+      entry = { block: b, session, movements };
+    const g = groups.get(key);
+    if (g) g.entries.push(entry);
+    else
+      groups.set(key, {
+        key,
+        title: blockTitle(b),
+        details:
+          b.format === "emom"
+            ? [
+                `Intervall ${b.intervalSeconds ?? "–"} s`,
+                ...(b.alternate && ids.length > 1 ? ["abwechselnd"] : []),
+              ].join(" · ")
+            : "",
+        exerciseIds: ids,
+        entries: [entry],
+      });
+  }
+  const newest = (e: BlockEntry) =>
+    e.session.date + (e.session.finishedAt ?? "");
+  return [...groups.values()]
+    .map((g) => {
+      const entries = g.entries.sort((a, c) =>
+        newest(c).localeCompare(newest(a)),
+      );
+      // Exercise order as in the most recent block.
+      return {
+        ...g,
+        exerciseIds: entries[0].movements.map((m) => m.exerciseId),
+        entries,
+      };
+    })
+    .sort((a, c) => newest(c.entries[0]).localeCompare(newest(a.entries[0])));
+}
+
 // Next position among the standalone exercises and blocks of a session.
 export async function nextOrder(sessionId: string) {
   const items = [

@@ -9,6 +9,7 @@ import {
   intervals,
   beepAt,
   removeMovement,
+  repeatedBlocks,
   scoreText,
   timerView,
   updateBlock,
@@ -17,7 +18,7 @@ import {
 import { deleteSession, startSession, addExercise } from "./training";
 import { personalRecords, series, volume } from "./calculations";
 import { importData, makeBackup, validateRelations } from "./import-export";
-import { type Block } from "./model";
+import { type Block, type Data, emptyData } from "./model";
 
 const block = (b: Partial<Block>): Block => ({
   id: "b",
@@ -96,6 +97,142 @@ describe("block plan", () => {
       { total: 5, done: 3 },
     ]);
     expect(scoreText(b)).toBe("Timecap · 3 Runden + 4 Wdh");
+  });
+});
+
+describe("repeated blocks", () => {
+  // One session per block, each block with the given movements.
+  function data(
+    rows: {
+      block: Partial<Block>;
+      date: string;
+      exercises: string[];
+      finished?: boolean;
+    }[],
+  ): Data {
+    const d = emptyData();
+    rows.forEach((r, i) => {
+      const sessionId = "s" + i,
+        blockId = "b" + i;
+      d.sessions.push({
+        id: sessionId,
+        date: r.date,
+        finishedAt: r.finished === false ? undefined : r.date + "T10:00:00Z",
+      });
+      d.blocks.push(block({ ...r.block, id: blockId, sessionId }));
+      r.exercises.forEach((exerciseId, j) =>
+        d.sessionExercises.push({
+          id: `${blockId}-m${j}`,
+          sessionId,
+          exerciseId,
+          blockId,
+          order: j,
+          status: "planned",
+          targetReps: 5,
+        }),
+      );
+    });
+    return d;
+  }
+  const emom = { minutes: 10, intervalSeconds: 60, scoreRounds: 10 };
+
+  it("groups the same EMOM over time, newest first, exercises in any order", () => {
+    const groups = repeatedBlocks(
+      data([
+        { block: emom, date: "2026-10-01", exercises: ["squat", "pullup"] },
+        { block: emom, date: "2026-11-05", exercises: ["pullup", "squat"] },
+        { block: emom, date: "2026-10-20", exercises: ["squat", "pullup"] },
+      ]),
+    );
+    expect(groups).toHaveLength(1);
+    expect(groups[0].title).toBe("EMOM 10'");
+    expect(groups[0].details).toBe("Intervall 60 s");
+    expect(groups[0].entries.map((e) => e.session.date)).toEqual([
+      "2026-11-05",
+      "2026-10-20",
+      "2026-10-01",
+    ]);
+    // Exercise order as in the most recent block.
+    expect(groups[0].exerciseIds).toEqual(["pullup", "squat"]);
+  });
+  it("separates blocks that differ in duration, interval, turns or exercises", () => {
+    const groups = repeatedBlocks(
+      data([
+        { block: emom, date: "2026-11-01", exercises: ["squat"] },
+        {
+          block: { ...emom, minutes: 12 },
+          date: "2026-11-02",
+          exercises: ["squat"],
+        },
+        {
+          block: { ...emom, intervalSeconds: 90, minutes: 15 },
+          date: "2026-11-03",
+          exercises: ["squat"],
+        },
+        { block: emom, date: "2026-11-04", exercises: ["squat", "pullup"] },
+        {
+          block: { ...emom, alternate: true },
+          date: "2026-11-05",
+          exercises: ["squat", "pullup"],
+        },
+        {
+          block: { format: "amrap", minutes: 10, scoreRounds: 4 },
+          date: "2026-11-06",
+          exercises: ["squat"],
+        },
+      ]),
+    );
+    expect(groups).toHaveLength(6);
+    expect(groups[0].title).toBe("AMRAP 10'");
+    expect(groups[1].details).toBe("Intervall 60 s · abwechselnd");
+  });
+  it("keeps a For Time together when only the time cap changed", () => {
+    const groups = repeatedBlocks(
+      data([
+        {
+          block: { format: "for_time", rounds: 5, scoreSeconds: 600 },
+          date: "2026-10-01",
+          exercises: ["burpee"],
+        },
+        {
+          block: {
+            format: "for_time",
+            rounds: 5,
+            minutes: 12,
+            capped: true,
+            scoreRounds: 4,
+          },
+          date: "2026-11-01",
+          exercises: ["burpee"],
+        },
+      ]),
+    );
+    expect(groups).toHaveLength(1);
+    expect(groups[0].title).toBe("5 Runden For Time");
+    expect(groups[0].entries.map((e) => scoreText(e.block))).toEqual([
+      "Timecap · 4 Runden",
+      "10:00",
+    ]);
+  });
+  it("leaves out running sessions, blocks without result or movements", () => {
+    expect(
+      repeatedBlocks(
+        data([
+          {
+            block: emom,
+            date: "2026-11-01",
+            exercises: ["squat"],
+            finished: false,
+          },
+          {
+            block: { minutes: 10, intervalSeconds: 60 },
+            date: "2026-11-02",
+            exercises: ["squat"],
+          },
+          { block: emom, date: "2026-11-03", exercises: [] },
+        ]),
+      ),
+    ).toEqual([]);
   });
 });
 
