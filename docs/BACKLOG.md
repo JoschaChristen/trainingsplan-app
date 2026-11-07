@@ -21,21 +21,10 @@ housekeeping"), [`ROADMAP.md`](ROADMAP.md) ("After stage 2 is in use").
 | OAuth from the installed home-screen app | needs owner | Android may open the callback in a Chrome tab; check the key arrives in the app |
 | Real AI request | needs owner | Needs OpenRouter credits; some providers may reject strict JSON-schema keywords (`minLength`) |
 
-## Behaviour decisions
-
-| Item | Status | Notes |
-| ---- | ------ | ----- |
-| "Tag X trainieren" while another session runs | decide | Currently opens the running session without notice |
-| Copy-forward overwrites deload weeks | decide | Possibly intended |
-| One %-cell without current 1RM blocks the whole session | decide | After 6 weeks without an e1RM the planned day cannot start |
-| Legacy re-import "ersetzen" option | decide | `LEGACY-IMPORT.md` mentions it; code only refuses (safe default) |
-
 ## Code and tests
 
 | Item | Status | Notes |
 | ---- | ------ | ----- |
-| Error toast wiring in `useAction` | open | `errorText` is unit-tested, its use in `useAction` is not |
-| Unaccepted AI cycle plans after merging a backup into another install | open | Exercise ids in stored AI output are not remapped; workaround: request the plan again |
 | Plan workout blocks in cycles, include them in AI inputs | open | AI summaries still see block sets only as plain sets (volume, best reps) |
 
 Known and intended, no action: backup restore switches AI off (the key is kept).
@@ -51,6 +40,8 @@ Known and intended, no action: backup restore switches AI off (the key is kept).
 
 | Item | Done | Notes |
 | ---- | ---- | ----- |
+| Behaviour decisions (owner chose variant A for all) | 07.11.2026 | Branch `claude/behaviour-decisions`: "Tag X trainieren" asks when a session runs; copy-forward skips deload weeks; a %-cell without 1RM no longer blocks the session; no legacy "ersetzen" (doc fixed) |
+| `useAction` error notice tested; AI cycle plans remapped when merging a backup | 07.11.2026 | Branch `claude/behaviour-decisions` |
 | Compare repeated blocks: tab «Blöcke» on Fortschritt | 07.11.2026 | Branch `ccr-492a7b85-yrxhrt` |
 | Workout blocks (EMOM, AMRAP, For Time) in a session: logging, result, built-in timer | 07.11.2026 | PR #6 |
 | Delete sessions, remove filler subtitles, icon back button, simpler "Zyklus planen" card | 07.11.2026 | Branch `claude/app-features-expansion-ll2qf2` |

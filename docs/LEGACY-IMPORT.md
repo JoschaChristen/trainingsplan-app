@@ -114,7 +114,9 @@ reactivate it in the cycles screen). `startDate` = the date of the week-1 sessio
 
 ### Safety
 - Import is all-or-nothing in one Dexie transaction.
-- If a cycle with `createdBy: 'legacy'` already exists, warn and offer "ersetzen"
-  (delete previous legacy import) or "abbrechen".
+- If a cycle with `createdBy: 'legacy'` already exists, refuse a second import with a
+  notice (it would create duplicates). There is deliberately no "ersetzen" option:
+  the import is a one-off step and replacing would delete real data (owner decision,
+  07.11.2026).
 - After import, show a summary (exercises, sessions, sets) and offer a backup export.
 - Unit-test the importer with `docs/legacy/sample-export.json`.

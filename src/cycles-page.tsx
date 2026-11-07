@@ -7,8 +7,9 @@ import {
   Play,
   ArrowUp,
   ArrowDown,
+  Trash2,
 } from "lucide-react";
-import { db } from "./db";
+import { db, readData } from "./db";
 import {
   cycleSchema,
   cellSchema,
@@ -18,6 +19,7 @@ import {
   type CycleCell,
   type Exercise,
   fmt,
+  formatDate,
 } from "./model";
 import {
   Header,
@@ -31,9 +33,9 @@ import {
   useAction,
   formValue,
 } from "./ui";
-import { currentRm, loadKg, progressed } from "./calculations";
+import { currentRm, forwardWeeks, loadKg, progressed } from "./calculations";
 import { cycleWeek } from "./overview";
-import { startSession } from "./training";
+import { deleteSession, startSession } from "./training";
 export function Cycles() {
   const { data } = useApp(),
     [create, setCreate] = useState(false),
@@ -182,8 +184,16 @@ export function CycleEditor() {
     [addDay, setAddDay] = useState(false),
     [cell, setCell] = useState<CycleCell>(),
     [showKg, setShowKg] = useState(true),
-    [template, setTemplate] = useState("linear");
+    [template, setTemplate] = useState("linear"),
+    [running, setRunning] = useState(false);
   if (!c) return <Empty title="Zyklus nicht gefunden" />;
+  const ongoing = data.sessions.find((s) => s.startedAt && !s.finishedAt);
+  // Reads fresh data: after discarding, the rendered data still holds the
+  // deleted session and startSession would return it.
+  const startDay = async (dayId: string) =>
+    nav(
+      "/session/" + (await startSession(await readData(), dayId, cycleWeek(c))),
+    );
   const days = data.days
       .filter((d) => d.cycleId === c.id)
       .sort((a, b) => a.order - b.order),
@@ -439,17 +449,46 @@ export function CycleEditor() {
             className="primary"
             disabled={busy || !entries.length}
             onClick={() =>
-              void run(async () => {
-                nav(
-                  "/session/" +
-                    (await startSession(data, day.id, cycleWeek(c))),
-                );
-              })
+              ongoing ? setRunning(true) : void run(() => startDay(day.id))
             }
           >
             <Play size={18} /> {day.label} trainieren
           </button>
         </>
+      )}
+      {running && ongoing && day && (
+        <Modal
+          title="Es läuft bereits ein Training"
+          onClose={() => setRunning(false)}
+        >
+          <p>
+            «{ongoing.title ?? "Training"}» vom {formatDate(ongoing.date)} ist
+            noch nicht abgeschlossen.
+          </p>
+          <button
+            className="primary"
+            onClick={() => nav("/session/" + ongoing.id)}
+          >
+            <Play size={18} /> Weiterführen
+          </button>
+          <button
+            className="outline"
+            disabled={busy}
+            onClick={() =>
+              void run(async () => {
+                await deleteSession(ongoing.id);
+                sessionStorage.removeItem("training-rest");
+                await startDay(day.id);
+              })
+            }
+          >
+            <Trash2 size={18} /> Verwerfen und {day.label} starten
+          </button>
+          <small>
+            Beim Verwerfen werden die Übungen und Sätze des laufenden Trainings
+            gelöscht.
+          </small>
+        </Modal>
       )}
       {!days.length && (
         <Empty title="Deine Trainingstage">
@@ -672,29 +711,32 @@ function CellEditor({
             });
             const forward = f.get("forward") === "on",
               increment = Number(f.get("increment") || 0);
-            const cells = Array.from(
-              { length: forward ? cycle.weeks - cell.week + 1 : 1 },
-              (_, i) =>
-                cellSchema.parse({
-                  ...v,
-                  id:
-                    i === 0
-                      ? v.id
-                      : (data.cells.find(
-                          (c) =>
-                            c.entryId === v.entryId && c.week === v.week + i,
-                        )?.id ?? uid()),
-                  week: v.week + i,
-                  pct:
-                    v.pct === undefined
-                      ? undefined
-                      : progressed(v.pct, increment, i),
-                  kg:
-                    v.kg === undefined
-                      ? undefined
-                      : progressed(v.kg, increment, i, exercise.weightStep),
-                }),
-            );
+            const weeks = forward
+              ? forwardWeeks(cell.week, cycle.weeks, cycle.deloadWeeks)
+              : [cell.week];
+            // The increment counts calendar weeks, so a skipped deload week
+            // does not shift the progression of the weeks after it.
+            const cells = weeks.map((week) => {
+              const i = week - v.week;
+              return cellSchema.parse({
+                ...v,
+                id:
+                  i === 0
+                    ? v.id
+                    : (data.cells.find(
+                        (c) => c.entryId === v.entryId && c.week === week,
+                      )?.id ?? uid()),
+                week,
+                pct:
+                  v.pct === undefined
+                    ? undefined
+                    : progressed(v.pct, increment, i),
+                kg:
+                  v.kg === undefined
+                    ? undefined
+                    : progressed(v.kg, increment, i, exercise.weightStep),
+              });
+            });
             await db.cells.bulkPut(cells);
             onClose();
           });
@@ -760,6 +802,8 @@ function CellEditor({
         <label className="check">
           <input type="checkbox" name="forward" /> Auf folgende Wochen
           übertragen
+          {cycle.deloadWeeks.some((w) => w > cell.week) &&
+            " (ohne Deload-Wochen)"}
         </label>
         <Field label="Steigerung pro weiterer Woche (%)">
           <input

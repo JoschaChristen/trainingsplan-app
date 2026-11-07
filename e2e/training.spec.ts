@@ -75,6 +75,7 @@ test("a planned session starts from the active cycle", async ({ page }) => {
   await sheet(page).getByLabel("Wochen").fill("4");
   await sheet(page).getByRole("button", { name: "Zyklus anlegen" }).click();
   await page.waitForURL(/#\/cycles\/.+/);
+  const cycleUrl = page.url();
   await page
     .getByRole("button", { name: "Trainingstag hinzufügen" })
     .first()
@@ -86,14 +87,20 @@ test("a planned session starts from the active cycle", async ({ page }) => {
     .getByRole("button", { name: "Kniebeuge Woche 1 bearbeiten" })
     .click();
   await sheet(page).getByLabel("Gewicht (kg)").fill("80");
-  await sheet(page).getByLabel("Auf folgende Wochen übertragen").check();
+  const cells = async () =>
+    ((await dump(page)).cells as { week: number; kg?: number }[])
+      .sort((a, b) => a.week - b.week)
+      .map((c) => c.kg);
+  const deloadKg = (await cells())[3];
+  expect(deloadKg).not.toBe(85);
+  await sheet(page)
+    .getByLabel("Auf folgende Wochen übertragen (ohne Deload-Wochen)")
+    .check();
   await sheet(page).getByLabel("Steigerung pro weiterer Woche (%)").fill("2.5");
   await sheet(page).getByRole("button", { name: "Speichern" }).click();
   await expect(sheet(page)).toHaveCount(0);
-  const kg = ((await dump(page)).cells as { week: number; kg: number }[])
-    .sort((a, b) => a.week - b.week)
-    .map((c) => c.kg);
-  expect(kg).toEqual([80, 82.5, 85, 85]);
+  // Week 4 is the deload week and keeps its lighter load.
+  expect(await cells()).toEqual([80, 82.5, 85, deloadKg]);
 
   await page.getByRole("button", { name: "Als aktiven Zyklus setzen" }).click();
   await expect(
@@ -106,6 +113,24 @@ test("a planned session starts from the active cycle", async ({ page }) => {
   await expect(page.getByLabel("Kniebeuge Satz 1 Wiederholungen")).toHaveValue(
     "5",
   );
+  const running = page.url();
+
+  // Starting the day again while a session runs asks first.
+  await page.goto(cycleUrl);
+  await page.getByRole("button", { name: /trainieren$/ }).click();
+  await expect(sheet(page)).toContainText("ist noch nicht abgeschlossen");
+  await sheet(page).getByRole("button", { name: "Weiterführen" }).click();
+  await expect(page).toHaveURL(running);
+  await page.getByLabel("Kniebeuge Satz 1 kg").fill("90");
+  await page.goto(cycleUrl);
+  await page.getByRole("button", { name: /trainieren$/ }).click();
+  await sheet(page)
+    .getByRole("button", { name: /^Verwerfen und .+ starten$/ })
+    .click();
+  await page.waitForURL(/#\/session\//);
+  expect(page.url()).not.toBe(running);
+  await expect(page.getByLabel("Kniebeuge Satz 1 kg")).toHaveValue("80");
+  expect((await dump(page)).sessions).toHaveLength(1);
   expect(errors).toEqual([]);
 });
 

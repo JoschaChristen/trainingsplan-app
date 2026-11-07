@@ -262,6 +262,9 @@ Visual reference: `docs/design/` (read its README first).
   - reps_only: Satz | Vorher | Wdh | ✓ | delete
 - "Vorher" = same set index from the last session of this exercise.
 - Prefill: from the cycle cell (kg computed from %), else from the last session.
+  A %-cell without a current 1RM does not block the session: the weight stays empty
+  and the card shows "Kein aktueller 1RM … Gewicht selbst eintragen" until every work
+  set has a weight.
 - Buttons: "+ Satz" (copies last work set), "+ Aufwärmsatz" (inserted before work sets,
   label `W`, ~60 % of work weight), delete per set (with undo toast).
 - Optional RPE for the last work set (buttons 6–10 with short German hints).
@@ -288,7 +291,10 @@ Visual reference: `docs/design/` (read its README first).
   sticky first column; current week highlighted (baby), past weeks dimmed, deload dashed.
   Cell shows `sets×reps` and `% / kg / s`. Toggle `%` ↔ `kg` view.
 - Tap a cell → bottom sheet editor (sets, reps or seconds, load mode, value, note) with
-  "auf folgende Wochen übertragen" and "+x % pro Woche" helpers.
+  "auf folgende Wochen übertragen" and "+x % pro Woche" helpers. Copying forward skips
+  deload weeks (their lighter load is kept); the increment still counts calendar weeks.
+- "Tag X trainieren" while another session runs opens a dialog: "Weiterführen" (the
+  running session) or "Verwerfen und Tag X starten" (deletes the running session).
 - Templates: linear progression, wave (3 up / 1 down), "deload last week".
 - Buttons: "KI-Vorschlag" (see 6.1) and "Aus Vorlage".
 - Only one cycle can be active.

@@ -399,6 +399,21 @@ function remapExerciseRefs(d: Data, remap: Map<string, string>) {
   for (const rm of d.oneRms) rm.exerciseId = mapped(rm.exerciseId);
   for (const stage of d.stages)
     if (stage.exerciseId) stage.exerciseId = mapped(stage.exerciseId);
+  // A stored AI cycle plan names exercises by id; it is validated again
+  // when accepted, so only well-formed entries are touched. The output is
+  // copied first: zod passes `unknown` values through by reference.
+  for (const run of d.aiRuns) {
+    if (run.kind !== "cycle_plan") continue;
+    const output = structuredClone(run.output) as {
+      days?: { entries?: { exerciseId?: unknown }[] }[];
+    } | null;
+    if (!Array.isArray(output?.days)) continue;
+    for (const day of output.days)
+      for (const entry of Array.isArray(day?.entries) ? day.entries : [])
+        if (typeof entry?.exerciseId === "string")
+          entry.exerciseId = mapped(entry.exerciseId);
+    run.output = output;
+  }
 }
 // Merging a backup into another install: every install seeds the default
 // exercises with fresh ids, so match unknown ids by name and type instead of
